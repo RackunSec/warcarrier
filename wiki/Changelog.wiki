@@ -1,0 +1,8 @@
+#This is the change-log page
+
+= Changes 02.18.2013 =
+* Alpha (Still in development)
+* "Help" - which can be accessed with "h"
+* "Snapshots" - which can be taken with "s"
+* "Graphing" - which can be reset with "g"
+* Stats on right side for WiFi data working
