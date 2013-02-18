@@ -1,0 +1,12 @@
+#this is the manual.
+
+= Installation =
+tar vzxf warcarrier.tar.gz<br />
+do "./run_me_first.sh" in the directory to check / install dependencies<br />
+
+= Key Commands =
+
+  * "h" for help.
+  * "s" for snapshot.
+  * "g" to reset graph.
+  * "q" OR "CTRL+C" to quit.
