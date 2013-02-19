@@ -5,4 +5,4 @@
   * Google Maps API link/map generation.
   * Logging in 3d for ALL APs, not just snapshots.
   * run_me_first.sh file creation.
-  * add depth to graph with pipes.
+  * [X] add depth to graph with pipes.
