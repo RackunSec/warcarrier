@@ -6,3 +6,10 @@
   * "Snapshots" - which can be taken with "s"
   * "Graphing" - which can be reset with "g"
   * Stats on right side for WiFi data working
+
+= Changes 02.26.2013 =
+  * Google Maps generation when quit (asks confirm first)
+  * Code my own object oriented Perl module for Google Maps lib::GMAPS
+  * Daemon no longer a daemon but background-ed by warcarrier.pl
+  * Graph now solid bars
+  * Channels now solid bars
