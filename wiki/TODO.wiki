@@ -1,8 +1,8 @@
 #Things I want / have to do
 
 = List (x) means completed. =
-  * Catchme-NG addition.
+  * (x) Catchme-NG addition.
   * (x) Google Maps API link/map generation.
-  * Logging in 3d for ALL APs, not just snapshots.
-  * run_me_first.sh file creation.
+  XXX * Logging in 3d for ALL APs, not just snapshots.
+  XXX * run_me_first.sh file creation.
   * (x) add depth to graph with pipes.
