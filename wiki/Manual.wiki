@@ -2,7 +2,7 @@
 
 = Installation =
 tar vzxf warcarrier.tar.gz<br />
-do "./run_me_first.sh" in the directory to check / install dependencies<br />
+./warcarrier
 
 = Key Commands =
 
@@ -10,4 +10,6 @@ do "./run_me_first.sh" in the directory to check / install dependencies<br />
   * "s" for snapshot.
   * "g" to reset graph.
   * "q" OR "CTRL+C" to quit.
-  * "I" extra satellite info.
+  * "i" extra satellite info.
+  * "c" Catchme-NG! functionality
+  * "b" add Bluetooth device at any time
