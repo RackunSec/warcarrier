@@ -1,8 +1,0 @@
-#Things I want / have to do
-
-= List (x) means completed, (XXX) means deprecated =
-  * (x) Catchme-NG addition.
-  * (x) Google Maps API link/map generation.
-  * XXX -- Logging in 3d for ALL APs, not just snapshots.
-  * XXX -- run_me_first.sh file creation.
-  * (x) add depth to graph with pipes.
