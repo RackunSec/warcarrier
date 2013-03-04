@@ -12,4 +12,4 @@ tar vzxf warcarrier.tar.gz<br />
   * "q" OR "CTRL+C" to quit.
   * "i" extra satellite info.
   * "c" Catchme-NG! functionality
-  * "b" add Bluetooth device at any time
+  * "b" ~~add Bluetooth device at any time~~
