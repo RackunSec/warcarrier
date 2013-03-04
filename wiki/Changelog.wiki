@@ -1,7 +1,7 @@
 #This is the change-log page
 = Changes 03.04.2013 =
   * WARCARRIER starts Airodump-ng automatically
-  * Command-Line paramters for -d <device> and -f <csvfilename>
+  * Command-Line paramters for -d device and -f csvfilename
   * Net::Bluetooth used in hcitool-utils's stead
   * 802.11 Activity Graph now full length of application
   * Channels 12 and 13 added to the channel bar graphs
