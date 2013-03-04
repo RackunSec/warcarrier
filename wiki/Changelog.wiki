@@ -9,6 +9,7 @@
   * Satellite data added to HTML report
   * HTML report theme updated
   * Bluetooth and Satellite data added to snapshots
+  * Object-oriented Perl modules made for gathering command-line arguments (most likely will be moved into production of other/future applications)
 
 = Changes 02.26.2013 =
   * Google Maps generation when quit (asks confirm first)
