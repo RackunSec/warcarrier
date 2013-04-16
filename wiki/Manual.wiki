@@ -48,19 +48,19 @@ This utility takes the argument (all|logs|sys|proc)
   * "*x*" exit spectrum analyzer
 
   * *DEPRECATED*
-  * ~~"b" add Bluetooth device at any time~~
-  * ~~"h" for help.~~
+  * ~~"*b*" add Bluetooth device at any time~~
+  * ~~"*h*" for help.~~
 
 = Logging =
 All logs will be kept in the {{{ logs/ }}} directory.
 
 =Files=
-  * wcstartup.sh - Autostart script for WarcarrierOS and Weakerth4n Linux - This script will start warcarrier with {{{ -d mon0 -f file }}}
-  * wcd - the Warcarrier GPS|Bluetooth|WiFi daemon.
-  * wcclean - House cleaning application - run with arguments listed above in *Installation* section
-  * wbt_pi - the Ubertooth daemon. This writes to the file ubt.out
-  * warcarrier - our application
-  * README - some lame excuse for a README
-  * ./logs - logs directory
-  * ./lib - my OO Perl modules
-  * ./includes - files included for imagery, sorcery, and other
+  * *wcstartup.sh* - Autostart script for WarcarrierOS and Weakerth4n Linux - This script will start warcarrier with {{{ -d mon0 -f file }}}
+  * *wcd* - the Warcarrier GPS|Bluetooth|WiFi daemon.
+  * *wcclean* - House cleaning application - run with arguments listed above in *Installation* section
+  * *wbt_pi* - the Ubertooth daemon. This writes to the file ubt.out
+  * *warcarrier* - our application
+  * *README* - some lame excuse for a README
+  * *./logs* - logs directory
+  * *./lib* - my OO Perl modules
+  * *./includes* - files included for imagery, sorcery, and other
