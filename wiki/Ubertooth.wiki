@@ -1,0 +1,50 @@
+#summary One-sentence summary of this page.
+
+= Ubertooth =
+
+[http://warcarrier.org/images/ubertoothdell.jpg]
+
+<a href="http://ubertooth.sourceforge.net/">http://ubertooth.sourceforge.net/</a>
+
+Warcarrier now has support for the Ubertooth Bluetooth (spectrum analyzer functionality only) using Dragorn's SpecTools. I use spectool_raw to poll the device for the raw dBm values of RSSI (received signal strength Indication) levels. Here is an example of output:
+
+{{{
+-100 -97 -100 -88 -97 -99 -86 -97 -100 ... 
+}}}
+
+These values are preprocessed and dBm values according to the spectools Author himself. I take them and draw lines using the difference in (dBm_MAX - RSSI_dBm) yielding (from above output)
+
+{{{
+0 3 0 12 3 1 14 3 0
+}}}
+
+The lines are then made like so:
+
+{{{
+         |
+         |
+   |     |
+   |     |
+   |     |
+   |     |
+   |     |
+   |     |
+   |     |
+   |     |
+   |     |
+ | | |   | |
+ | | |   | |
+_| | |_| | |_
+}}}
+
+Then I simply reverse them into spaces with <a href="http://search.cpan.org/~mdxi/Curses-UI-0.9609/">Curses::UI</a>'s {{{ -reverse=>1 }}} attribute to the Label object and display them with the corresponding value to the left and a small key in the top right with color coded lines.
+
+Each bar is a Curses::UI Label object, which is kind of clunky, but works. So to do this, I used simple logic/magic to convert these bars into one-line bars in a new array, which I invented with a dry-erase marker on my large bathroom mirror.
+ 
+== Spectools ==
+<a href="http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
+
+
+
+= Testing =
+Tested with Ubertooth One and Spectools_Raw
