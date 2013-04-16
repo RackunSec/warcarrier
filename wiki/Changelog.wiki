@@ -1,4 +1,4 @@
-#Summary This is the change-log page
+#summary This is the change-log page
 
 = Changes 04.16.2013 =
   * wcclean now takes an argument (all|sys|proc|logs)
