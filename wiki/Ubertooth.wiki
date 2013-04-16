@@ -21,20 +21,21 @@ These values are preprocessed and dBm values according to the spectools Author h
 The lines are then made like so:
 
 {{{
-         |
-         |
-   |     |
-   |     |
-   |     |
-   |     |
-   |     |
-   |     |
-   |     |
-   |     |
-   |     |
- | | |   | |
- | | |   | |
-_| | |_| | |_
+---              |
+--         |     |
+-90dBm     |     |
+-          |     |
+--         |     |
+---        |     |
+--         |     |
+-95dBm     |     |
+-          |     |
+--         |     |
+--         |     |
+---      | | |   | |
+--       | | |   | |
+-100dBm _| | |_| | |_
+        2400MHz 2406MHz ...
 }}}
 
 Then I simply reverse them into spaces with <a href="http://search.cpan.org/~mdxi/Curses-UI-0.9609/">Curses::UI</a>'s {{{ -reverse=>1 }}} attribute to the Label object and display them with the corresponding value to the left and a small key in the top right with color coded lines.
