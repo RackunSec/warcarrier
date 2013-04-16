@@ -32,10 +32,10 @@ You can also do {{{ ./wcstartup.sh }}}
 If the Application stops for no apparent reason - this is the result of Curses::UI, the daemons won't runaway! They will be reconnected to Warcarrier upon restart. If you restart warcarrier, it will not spwan a second process for Airodump-NG, Bluetooth, or GPS. It uses the environment (ps aux) to check if they are already running - please ignore the second "Please wait..." status message that will display, this is just the application checking for dependencies.<br />If, however, you do not want to restart Warcarrier, you should use the Warcarrier cleanup utility {{{ wcclean }}}
 
 This utility takes the argument (all|logs|sys|proc)
- * all - stops ALL runaway processes and removes ALL logs
- * logs - removes all logs and pcap files
- * sys - removes all system buffer files created during use
- * proc - stops ALL processes used or not used but shared by Warcarrier
+ * *all* - stops ALL runaway processes and removes ALL logs
+ * *logs* - removes all logs and pcap files
+ * *sys* - removes all system buffer files created during use
+ * *proc* - stops ALL processes used or not used but shared by Warcarrier
 
 = Keyboard Commands =
 
@@ -52,7 +52,7 @@ This utility takes the argument (all|logs|sys|proc)
   * ~~"*h*" for help.~~
 
 = Logging =
-All logs will be kept in the {{{ logs/ }}} directory.
+All logs will be kept in the {{{ logs/ }}} directory. When Warcarrier finds an AP via Catchme-NG there will be a text log in {{{./logs/txt }}} When Warcarrier asks to "log your adventure", it will be a log in {{{ ./logs/html}}} as an HTML file with the Google Map.
 
 =Files=
   * *wcstartup.sh* - Autostart script for WarcarrierOS and Weakerth4n Linux - This script will start warcarrier with {{{ -d mon0 -f file }}}
