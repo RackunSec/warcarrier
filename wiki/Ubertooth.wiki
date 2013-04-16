@@ -7,9 +7,9 @@
 <a href="http://ubertooth.sourceforge.net/">http://ubertooth.sourceforge.net/</a>
 
 === dBm ===
-The RSSI (received signal strength Indication) is measured in dBm which is to say 1 decibel using milliwatt as a reference. It simply is a power, or intensity measurement of the received signal from the antenna. It is a negative value with (in our case) -100 being the weakest signal strength and going _*up*_ to 0. This means that a -60dBm is stronger than a -90dBm signal, obviously.
+The RSSI (received signal strength Indication) is measured in dBm which is to say 1 decibel using milliwatt as a reference. It simply is a power, or intensity measurement of the received signal from the antenna. It is a negative value with (in our case) -100 being the weakest signal strength and going _*up*_ to 0. This means that a -60dBm is stronger than a -90dBm signal, obviously. Bluetooth protocol uses a 1600x/second frequency hopping scheme across a "< ahref="http://en.wikipedia.org/wiki/Spread_spectrum">spread spectrum</a>" of channels which range from frequencies: 2.400GHz to 2.485GHz
 
-Warcarrier now has support for the Ubertooth Bluetooth (spectrum analyzer functionality only) using Dragorn's SpecTools. I use spectool_raw to poll the device for the raw dBm values of RSSI  levels. Here is an example of output:
+Warcarrier now has support for the Ubertooth Bluetooth (spectrum analyzer functionality only) using Dragorn's spectools. I use spectool_raw to poll the device for the raw dBm values of RSSI  levels. Here is an example of output:
 
 {{{
 -100 -97 -100 -88 -97 -99 -86 -97 -100 ... 
