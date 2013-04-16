@@ -20,7 +20,8 @@ make && make install
 Just make sure the terminal is wide enough:
 
 {{{
-tar vzxf warcarrier-*.tar.gz
+svn checkout https://warcarrier.googlecode.com/svn/trunk/ warcarrier
+cd warcarrier
 iwconfig wlan0 mode monitor # should make mon0 - change wlan0 to your device
 ./warcarrier -d mon0 - outputfile
 }}}
