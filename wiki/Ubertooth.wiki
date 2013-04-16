@@ -6,7 +6,10 @@
 
 <a href="http://ubertooth.sourceforge.net/">http://ubertooth.sourceforge.net/</a>
 
-Warcarrier now has support for the Ubertooth Bluetooth (spectrum analyzer functionality only) using Dragorn's SpecTools. I use spectool_raw to poll the device for the raw dBm values of RSSI (received signal strength Indication) levels. Here is an example of output:
+=== dBm ===
+The RSSI (received signal strength Indication) is measured in dBm which is to say 1 decibel using milliwatt as a reference. It simply is a power, or intensity measurement of the received signal from the antenna. It is a negative value with (in our case) -100 being the weakest signal strength and going _*up*_ to 0. This means that a -60dBm is stronger than a -90dBm signal, obviously.
+
+Warcarrier now has support for the Ubertooth Bluetooth (spectrum analyzer functionality only) using Dragorn's SpecTools. I use spectool_raw to poll the device for the raw dBm values of RSSI  levels. Here is an example of output:
 
 {{{
 -100 -97 -100 -88 -97 -99 -86 -97 -100 ... 
