@@ -6,7 +6,7 @@
     * sys - removes system files of application
     * proc - kills all runaway processes left behind by a bad exit from Curses::UI
     * logs - removes all log files - just as previous version did
-  * Warcarrer now has support for Ubertooth - <a href="http://ubertooth.sourceforge.net/">http://ubertooth.sourceforge.net/</a> It relies on Dragorn's spectools_raw to pull raw data from the device: <a href="http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
+  * Warcarrer now has support for Ubertooth - <a href="http://ubertooth.sourceforge.net/">http://ubertooth.sourceforge.net/</a> It relies on Dragorn's spectools_raw to pull raw data from the device: <a href="http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
     * press (u) to access,
     * press (x) to close Ubertooth window
   * Cleaned up a lot of potentially - "uninitialized" variable errors in the code and added "use strict" 
