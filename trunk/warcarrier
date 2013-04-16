@@ -1,0 +1,695 @@
+#!/usr/bin/perl -w
+# WARCARRIER (c) GNU - 2013 WeakNet Labs
+#
+# "...because when we are done hacking the planet,
+#   - we will hack the sky!" - Douglas Berdeaux 2013
+#
+# Coded by Douglas Berdeaux
+# WeakNetLabs@Gmail.com
+#
+# Please see README for GNU License.
+# 
+# NOTES: any hacking to thid file CAN be bad. curses in Perl
+#   is very delicate and will fail without returning errors
+#   if teh slightest thing goes wrong. In fact, if it does it
+#   without hacking, just restart it because it probabaly means
+#   that the buffer files haven't been made yet.
+#   If you see any "sleep"'s in here - that's why.
+#
+# This turned into a fuckin beast!
+# 
+#
+# My own modules:
+require lib::GMAPS;   # - create "map" objects
+require lib::ARGS;    # - get arguments nicely
+require lib::GPSO;    # - get GPS data from gpsd
+require lib::WIFI;    # - get wifi data from Airodump-ng output csv file
+require lib::SATINFO; # - get satellite info from NASA website (offline)
+use warnings;         # obviously.
+use strict;
+# Other modules
+use Curses::UI; # See CPAN website for usage on these
+use JSON::XS;   #   modules.
+### GET ARGUMENTS BEFORE CONTINUING ###
+my $filename; # to read from
+my $wfdev; # wifi device
+my $btdev = ''; # bluetooth device
+my $date = localtime();
+my $sats;
+
+my $wpc = 0; # waypoints counter
+my $btdc = 0;
+
+my $btdisp = ''; # for showing local Bluetooth devices
+my @bttds; # for logging ALL found Bluetooth devices
+### MY WAYPOINTS AND MAP STUFF ###
+my @wps;
+if(!$ARGV[0]){
+	usage(1);
+}else{ # create args object and pull what we need:
+	my $args = lib::ARGS->new(@ARGV);
+	$wfdev = $args->getarg('-d',1); # pass getarg('flag','boolean (for required));
+	$filename = "logs/capfiles/" . $args->getarg('-f',1) . localtime();
+	$filename =~ s/ /./g;
+}
+my $devchk = `iwconfig $wfdev`; # let's see if they passed a valid device,
+if($devchk eq ''){              #  so we can fail gracefully if so.
+	usage('dev');
+}
+system("airodump-ng $wfdev --write $filename 2>/dev/null &"); # start scanning wifi
+$filename.="-01.csv"; # Airodump-ng does this to make unique files
+system("touch bt.out"); # create our bluetooth scanning file
+system("touch gps.TPV"); # create our bluetooth scanning file
+system("touch gps.SKY"); # create our bluetooth scanning file
+
+my $cui = new Curses::UI(-color_support=>1); # create a curses object
+$cui->status("Please wait while the WARCARRIER initializes"); # please hold.
+
+my @allsats; # for ALL satellites (HTML logging)
+my $gps = "NULL";
+my $lat = 0.00000;
+my $lon = 0.00000;
+my $alt = 0;
+my $dump = ''; # dump string for printing in window
+my $apc = 0; # AP Count for WiFi
+my %jhash = ();
+my $init = 1; # slow down the first read
+# These are for graphing WiFi
+my @lines = ();
+clrgraph();
+my $act = 0;
+# these are totals:
+my $wpac = 0;
+my $wpa2c = 0;
+my $wepc = 0;
+my $opnc = 0;
+my @logaps; # LOG of all APs and their Lat, Lon, Alt.
+my $catchme= ""; # Catchme-NG!
+my $catch = 0; # token to search
+my $satsq = ""; # this is a temporary string (list of satellites)
+
+$gps = lib::GPSO->new(); # create a new GPSO Object;
+
+### WINDOW DRAWING ###
+local $winlat::label;  # these are local variables that I can cal;l from sub
+local $winlon::label;  #   routines and rewrite the god damn it fuick im furcking ddrruink.
+local $winalt::label;  
+local $wincli::label;  
+local $winspe::label;  
+local $wintra::label;  
+local $winsat::label;  
+local $winson::label;  
+local $winsc::label;  
+local $winfix::progressbar;
+
+local $windmp::label;
+local $winch11::label;
+local $winch10::label;
+local $winch9::label;
+local $winch8::label;
+local $winch7::label;
+local $winch6::label;
+local $winch5::label;
+local $winch4::label;
+local $winch3::label;
+local $winch2::label;
+local $winch1::label;
+local $winch12::label;
+local $winch13::label;
+
+local $lubt::label; # this is for the ubertooth window's label
+my $winubt;
+my $ubton = 0;
+
+local $wingrph::label; # The 802.11 graph!
+
+local $winwpa2::label; # All WPA2 count
+local $winwpa::label; # WPA count
+local $winwep::label; # All WEP count
+local $winopn::label; # All OPN count
+local $winapc::label; # all AP count
+
+local $winclock::label; # the clock in the middle of the app
+
+#local $winbtc::label; # Bluetooth Count
+local $winbt::label; # The Bluetooth dump window!
+
+my $titlewid = $cui->add('titlew','Window',-border=>0,-height=>1,-width=>34);
+$titlewid->add('titlel', 'Label',-text =>" WARCARRIER - 2013 WeakNet Labs",-bold => 1,-fg=>"blue",-height=>1);
+my $widlon = $cui->add('lon', 'Window',-border => 1,-title=>'Longitude',-height=>1,-width=>15,-y=>2);
+my $widlat = $cui->add('lat', 'Window',-border => 1,-title=>'Latitude',-height=>1,-width=>15,-y=>5);
+my $widalt = $cui->add('alt', 'Window',-border => 1,-title=>'Altitude',-height=>1,-width=>15,-y=>8);
+my $widcli = $cui->add('cli', 'Window',-border => 1,-title=>'Climb',-height=>1,-width=>15,-y=>11);
+my $widspe = $cui->add('spe', 'Window',-border => 1,-title=>'Speed',-height=>1,-width=>15,-y=>14);
+my $widtra = $cui->add('tra', 'Window',-border => 1,-title=>'Track',-height=>1,-width=>15,-y=>14,-x=>15);
+my $widsc = $cui->add('satcount','Window',-border=>1,-title=>'Total',-height=>1,-y=>14,-x=>30,-width=>15);
+my $widso = $cui->add('saton','Window',-border=>1,-title=>'Online',-height=>1,-y=>14,-x=>45,-width=>14);
+
+## CLOCK:
+my $widclock = $cui->add('clock','Window',-border=>0,-height=>1,-x=>35,-width=>25);
+$winclock::label = $widclock->add('wclock','Label',-text=>$date,-bold=>0,height=>1,-width=>25);
+$winclock::label->draw();
+
+## SATELLITE BEEF:
+my $widsat = $cui->add('sat','Window',-border=>1,-tbg=>"yellow",-tfg=>"black",-title=>'Satellites',-height=>12,-x=>15,-y=>2,-width=>44);
+my $widfix = $cui->add('fix','Window',-border=>1,-title=>'Fix Type',-y=>17,-width=>47,-height=>5,-fg=>"red");
+
+## LABELS, PROG BARS, ETC:
+$winlon::label = $widlon->add('lon', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$winlon::label->draw;
+$winlat::label = $widlat->add('lat', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$winlat::label->draw;
+$winalt::label = $widalt->add('alt', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$winalt::label->draw;
+$wincli::label = $widcli->add('cli', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$wincli::label->draw;
+$wintra::label = $widtra->add('tra', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$wintra::label->draw;
+$winspe::label = $widspe->add('spe', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$winspe::label->draw;
+$winsc::label = $widsc->add('satcount', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$winsc::label->draw;
+$winson::label = $widso->add('saton', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>1);
+$winson::label->draw;
+$winfix::progressbar = $widfix->add('myfix','Progressbar',-max=>12,-min=>0,-pos=>0);
+$winfix::progressbar->draw;
+$winsat::label = $widsat->add('sat', 'Label',-text =>"Retrieving Data",-bold => 0,-width=>100,-height=>22);
+$winsat::label->draw;
+
+
+## WIFI WINDOWS:
+my $widdmp = $cui->add('wifidmp','Window',-border=>1,-tbg=>"yellow",-tfg=>"black",-title=>'Collected WiFi Data',-height=>15,-x=>59,-y=>2,-width=>58);
+
+my $widch1 = $cui->add('ch1','Window',-border=>1,-title=>'01',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>47,-titlefullwidth=>1);
+$winch1::label = $widch1->add('ch1l','Label',-height=>17,-width=>7);
+$winch1::label->draw();
+my $widch2 = $cui->add('ch2','Window',-border=>1,-title=>'02',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>53,-titlefullwidth=>1);
+$winch2::label = $widch2->add('ch2l','Label',-height=>17,-width=>7);
+$winch2::label->draw();
+my $widch3 = $cui->add('ch3','Window',-border=>1,-title=>'03',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>59,-titlefullwidth=>1);
+$winch3::label = $widch3->add('ch3l','Label',-height=>17,-width=>7);
+$winch3::label->draw();
+my $widch4 = $cui->add('ch4','Window',-border=>1,-title=>'04',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>65,-titlefullwidth=>1);
+$winch4::label = $widch4->add('ch4l','Label',-height=>17,-width=>7);
+$winch4::label->draw();
+my $widch5 = $cui->add('ch5','Window',-border=>1,-title=>'05',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>71,-titlefullwidth=>1);
+$winch5::label = $widch5->add('ch5l','Label',-height=>17,-width=>7);
+$winch5::label->draw();
+my $widch6 = $cui->add('ch6','Window',-border=>1,-title=>'06',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>77,-titlefullwidth=>1);
+$winch6::label = $widch6->add('ch6l','Label',-height=>17,-width=>7);
+$winch6::label->draw();
+my $widch7 = $cui->add('ch7','Window',-border=>1,-title=>'07',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>83,-titlefullwidth=>1);
+$winch7::label = $widch7->add('ch7l','Label',-height=>17,-width=>7);
+$winch7::label->draw();
+my $widch8 = $cui->add('ch8','Window',-border=>1,-title=>'08',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>89,-titlefullwidth=>1);
+$winch8::label = $widch8->add('ch8l','Label',-height=>17,-width=>7);
+$winch8::label->draw();
+my $widch9 = $cui->add('ch9','Window',-border=>1,-title=>'09',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>95,-titlefullwidth=>1);
+$winch9::label = $widch9->add('ch9l','Label',-height=>17,-width=>7);
+$winch9::label->draw();
+my $widch10 = $cui->add('ch10','Window',-border=>1,-title=>'10',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>101,-titlefullwidth=>1);
+$winch10::label = $widch10->add('ch10l','Label',-height=>17,-width=>7);
+$winch10::label->draw();
+my $widch11 = $cui->add('ch11','Window',-border=>1,-title=>'11',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>107,-titlefullwidth=>1);
+$winch11::label = $widch11->add('ch11l','Label',-width=>7,-height=>17);
+$winch11::label->draw();
+my $widch12 = $cui->add('ch12','Window',-border=>1,-title=>'12',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>113,-titlefullwidth=>1);
+$winch12::label = $widch1->add('ch12l','Label',-height=>17,-width=>7);
+$winch12::label->draw();
+my $widch13 = $cui->add('ch13','Window',-border=>1,-title=>'13',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>119,-titlefullwidth=>1);
+$winch13::label = $widch2->add('ch13l','Label',-height=>17,-width=>7);
+$winch13::label->draw();
+
+## GRAPHING WINDOW:
+my $widgrph = $cui->add('grph','Window',-border=>1,-title=>'802.11 Activity Graph',-y=>27,-width=>125,-height=>9);
+$wingrph::label = $widgrph->add('grphl','Label',-width=>"135",-bold=>1,-height=>"7");
+$wingrph::label->draw;
+
+## Stats WIndows on the left:
+
+my $widwpa2 = $cui->add('wpa2', 'Window',-border => 1,-title=>'WPA2',-height=>1,-width=>8,-y=>2,-x=>117);
+$winwpa2::label = $widwpa2->add('wpa2c','Label',-text=>$wpa2c,-width=>8);
+$winwpa2::label->draw;
+my $widwpa = $cui->add('wpa', 'Window',-border => 1,-title=>'WPA',-height=>1,-width=>8,-y=>5,-x=>117);
+$winwpa::label = $widwpa->add('wpac','Label',-text=>$wpac,-width=>8);
+$winwpa::label->draw;
+my $widwep = $cui->add('wep', 'Window',-border => 1,-title=>'WEP',-height=>1,-width=>8,-y=>8,-x=>117);
+$winwep::label = $widwep->add('wepc','Label',-text=>$wepc,-width=>8);
+$winwep::label->draw;
+my $widopn = $cui->add('opn', 'Window',-border => 1,-title=>'OPN',-height=>1,-width=>8,-y=>11,-x=>117);
+$winopn::label = $widopn->add('opnc','Label',-text=>$opnc,-width=>8);
+$winopn::label->draw;
+my $widapc = $cui->add('apc', 'Window',-border => 1,-title=>'APs',-height=>1,-width=>8,-y=>14,-x=>117);
+$winapc::label = $widapc->add('opnc','Label',-text=>$apc,-width=>8);
+$winapc::label->draw;
+#my $widbtc = $cui->add('btc', 'Window',-border => 1,-title=>'Blu',-height=>1,-width=>8,-y=>50,-x=>117);
+#$winbtc::label = $widbtc->add('btcl','Label',-text=>$btdc,-width=>8);
+#$winbtc::label->draw;
+
+## LABELS, PROG BARS, ETC
+$windmp::label = $widdmp->add('dmp','Label',-text=>'Retrieving Data',-bold=>0,-width=>100,-height=>33);
+$windmp::label->draw();
+
+### BLUETOOTH WINDOWS:
+my $widbt = $cui->add('btd','Window',-border=>1,-title=>'Nearby Bluetooth Devices',-y=>22,-width=>47,-height=>5);
+$winbt::label = $widbt->add('winbt','Label',-text=>"No remote devices found.",-ipadleft=>1,-height=>5,-width=>100);
+$winbt::label->draw();
+
+my $cmds = $cui->add('cmds','Window',-border=>0,-y=>36,-height=>1,-padleft=>1);
+$cmds->add('cmdl','Label',-bold=>1,-text=>" Keyboard Commands: (q)uit/CTRL+C, (s)napshot, clear (g)raph, (h)elp, satellite (i)nfo, (c)atchme-NG!, map a (w)aypoint",-reverse=>1);
+
+### END WINDOWS ###
+
+### KEY BINDINGS ###
+$cui->set_binding( \&clrgraph, "g"); # Clear Graph
+$cui->set_binding( \&help, "h"); # h for help
+$cui->set_binding( \&eggsit, "\cC"); # literally means CTRL+C (Eggsit)
+$cui->set_binding( \&eggsit, "q"); # eggsit
+$cui->set_binding( \&snapshot, "\cS"); # literally means CTRL+S (Snapshots)
+$cui->set_binding( \&snapshot, "s"); # s (Snapshots)
+$cui->set_binding( \&satinfo, "i"); # i Satellite infoz
+$cui->set_binding( \&catchmeinput, "c"); # c Catchme-NG
+$cui->set_binding( \&stopubt, "x"); # c Catchme-NG
+$cui->set_binding( \&startubt, "u"); # c Catchme-NG
+$cui->set_binding( \&waypoint, "w"); # c Catchme-NG
+
+#my $n = '('; # uncomment these two for ultra speed! (gps cannot keep up really though.
+#$cui->set_timer(1, \&getgpsd,$n); # will do this each second:
+
+$cui->set_timer('update_timer',\&getgpsd,0); # will do this each second:
+$cui->mainloop();
+
+sub clock{
+	$date = localtime();
+	$winclock::label->text($date);
+}
+sub getgpsd{
+	clock();
+	my $w = `ps aux | grep [T]PV | wc -l`;
+	if($w < 1){ 
+		system("./wcd TPV &");
+		system("./wcd SKY &");
+		system("./wcd bt $lat $lon &");
+	}else{
+		# it's already running! 
+	}
+	if($init == 1){ # TODO check here for file exists and pluck it
+		sleep 3; # 7 more seconds to slide away, somewhere in the sun... my head is in the sun...
+		$init = 0;
+	}
+	$sats = "";
+	my $satcount=0;
+	my $saton=0; # satellites online
+	## GET TPV Packet
+	parsedat($gps->packet('TPV'));
+
+	$lon = $jhash{'lon'};
+	$alt = $jhash{'alt'};
+	$alt.='m';
+	$lat = $jhash{'lat'};
+	my $cli;
+	my $spe;
+	if($jhash{'climb'} > 1){
+		$cli = $jhash{'climb'};
+	}else{
+		$cli = 0.00;
+	}
+	if($jhash{'speed'} > 1){
+		$spe = $jhash{'speed'};
+	}else{
+		$spe = 0.00;
+	}
+	my $tra = $jhash{'track'};
+	## GET SKY PACKET
+	parsedat($gps->packet('SKY'));
+	$satsq = ""; # reset satellite list to recreate:
+	for(my $i=0;$i<=32;$i++){
+		if($jhash{'satellites'}[$i]){ # does it exist?
+			$satcount++; # total goes up (which, locally, is zero to start)
+			my $satline .= "PRN ID:" . 
+			$jhash{'satellites'}[$i]{'PRN'} . " AZ:" . 
+			$jhash{'satellites'}[$i]{'az'} . " EL:" . 
+			$jhash{'satellites'}[$i]{'el'} . " SS:" . 
+			$jhash{'satellites'}[$i]{'ss'} . "dB ONLINE:" . 
+			$jhash{'satellites'}[$i]{'used'} . "\n";
+			$sats .= $satline; # I did this so I can use both :)
+			if($jhash{'satellites'}[$i]{'used'} == 1){
+				$saton++; # Online satellite caount goe up!
+			}
+			$satsq .= $jhash{'satellites'}[$i]{'PRN'} . ", ";
+			if(!grep(/$jhash{'satellites'}[$i]{'PRN'}/,@allsats)){
+				push(@allsats,$satline); # for logging ALL satellites for HTML
+			}
+		}else{ # we are done counting.
+			$i=32;
+		}
+	}
+	$cui->nostatus();
+	$lat =~ s/-//;
+	$lon =~ s/-//;
+	$lat.='N';
+	$lon.='W';
+	$winlon::label->text($lon);
+	$winlat::label->text($lat);
+	$winalt::label->text($alt);
+	$wincli::label->text($cli);
+	$winspe::label->text($spe);
+	$wintra::label->text($tra);
+	$winsat::label->text($sats);
+	$winson::label->text($saton);
+	$winsc::label->text($satcount);
+	if($saton >= 3){
+		$winfix::progressbar->pos($satcount);
+		$winfix::progressbar->set_color_fg("green");
+		$widfix->title("3D Fix (clear skies)");
+	}elsif($saton == 2){
+		$winfix::progressbar->pos($satcount);
+		$winfix::progressbar->set_color_fg("yellow");
+		$widfix->title("2D Fix (long and lat only)");
+
+	}else{
+		$winfix::progressbar->pos($satcount);
+		$winfix::progressbar->set_color_fg("red");
+		$widfix->title("No Fix (No satellites online)");
+		
+	}
+	# We are all done updating the windows, lets refocus the beefy one:
+	getwifi();
+}
+sub getwifi{ ### GET WIFI STATS ###
+	$dump = "";
+	# counting tokens:
+	my ($wepc,$wpa2c,$wpac,$opnc) = 0;
+	my ($ch1,$ch2,$ch3,$ch4,$ch5,$ch6,$ch7,$ch8,$ch9,$ch10,$ch11,$ch12,$ch13) = 0;
+	my @aps = lib::WIFI->aps($filename);
+	my %chan;
+	my $apc = 0;
+	foreach my $h (@aps){
+		if($catch){ # check for Catchme-NG!
+			if($h->{'ESSID'} =~ m/$catchme/){ # found it!
+				catchme();
+			}elsif($h->{'BSSID'} =~ m/$catchme/){ # found it!
+				catchme();
+			}
+		}
+		# create string for dump window:
+		my $essid = $h->{'ESSID'};
+		$essid =~ s/'/\'/g; # fix ESSIDs
+		$dump .= $h->{'BSSID'} . ", " . $h->{'CH'} . ", " . $h->{'PWR'} . ", " . $h->{'SEC'} . ", " . $essid . "\n"; 
+		if(!$lat){ $lat = 0.00000; }
+		if(!$lon){ $lon = 0.00000; }
+		if($lat ne "" && $lon ne "") { # let's not log if there's no coords so that JS doesn't break for the Maps:
+			my $logaps = $h->{'BSSID'} . ", " . $h->{'CH'} . ", " . $h->{'PWR'} . ", " . $h->{'SEC'} . ", " . $essid . "," . $lat . "," . $lon;
+			$logaps =~ s/, /,/g; # remove spaces from commas
+			push(@logaps, $logaps) if (!grep(/$h->{'BSSID'}/,@logaps)); # push it into the array IF not existed
+		}
+		# lets count channels for pretty signal bars:
+		$chan{$h->{'CH'}}++;
+		$apc++;
+		if($h->{'SEC'} =~ m/WEP/){
+			$wepc++;
+		}elsif($h->{'SEC'} =~ /WPA2/){
+			$wpa2c++;
+		}elsif($h->{'SEC'} =~ m/OPN/){
+			$opnc++;
+		}elsif($h->{'SEC'} =~ m/WPA /){
+			$wpac++;
+		}
+	}
+	$windmp::label->text($dump);
+	if($chan{'13'}){
+		sigbar($chan{'13'},$winch11::label);
+	}if($chan{'12'}){
+		sigbar($chan{'12'},$winch11::label);
+	}if($chan{'11'}){
+		sigbar($chan{'11'},$winch11::label);
+	}if($chan{'10'}){
+		sigbar($chan{'10'},$winch10::label);
+	}if($chan{'9'}){
+		sigbar($chan{'9'},$winch9::label);
+	}if($chan{'8'}){
+		sigbar($chan{'8'},$winch8::label);
+	}if($chan{'7'}){
+		sigbar($chan{'7'},$winch7::label);
+	}if($chan{'6'}){
+	sigbar($chan{'6'},$winch6::label);
+	}if($chan{'5'}){
+		sigbar($chan{'5'},$winch5::label);
+	}if($chan{'4'}){
+		sigbar($chan{'4'},$winch4::label);
+	}if($chan{'3'}){
+		sigbar($chan{'3'},$winch3::label);
+	}if($chan{'2'}){
+		sigbar($chan{'2'},$winch2::label);
+	}if($chan{'1'}){
+		sigbar($chan{'1'},$winch1::label);
+	}
+	$winwpa::label->text($wpac);
+	$winwpa2::label->text($wpa2c);
+	$winwep::label->text($wepc);
+	$winopn::label->text($opnc);
+	$winapc::label->text($apc);
+	# Now draw our graph lines:
+	graph($apc);
+	getbt();
+}
+sub graph{ ### GRAPH CREATION ###
+	$act++;
+	if($act >= 117){ # reset the graph, it's full!
+		clrgraph();
+		$act=0;
+	}
+	my $total = 0;
+	if($_[0] > 50){
+		$total = 6;
+	}elsif($_[0] >= 35 && $_[0] < 50){
+		$total = 5;
+	}elsif($_[0] >= 25 && $_[0] < 35){
+		$total = 4;
+	}elsif($_[0] >= 20 && $_[0] < 25){
+		$total = 3;
+	}elsif($_[0] >= 15 && $_[0] < 20){
+		$total = 2;
+	}elsif($_[0] >= 10 && $_[0] < 15){
+		$total = 1;
+	}elsif($_[0] >= 5 && $_[0] < 10){
+		$total = 0;
+	}
+	for(my $i=($total+1);$i<=$#lines;$i++){
+		$lines[$i] .= " "; # print spaces above peak on graph
+	}
+	if($total==0){ # add graph lines
+		$lines[0] .= "|";
+	}else{
+		for(my $i=$total;$i>=0;$i--){
+			$lines[$i] .= "|";
+		}
+	}
+	my $buff = ""; # final print line
+	for(my $i=6;$i>=0;$i--){ # print backwards:
+	        $buff .= $lines[$i] . "\n";
+	}
+
+	# Now let's print the graph:
+	$wingrph::label->text($buff);
+}
+sub clrgraph{ ## CLEAR THE GRAPH ##
+	@lines = ("05- ","10  ","15  ","20  ","25  ","35  ","50+ ");
+}
+sub sigbar{ ### My Channel Signal Bars ###
+	my $sigbar = '';
+	my $i = 0;
+	my $n = 0;
+	#my $sigdiv = int($_[0] / 2); # per every 2:
+	for($i=0;$i<$_[0];$i++){
+		$sigbar .= "    \n";
+		$n++;
+	}
+	$_[1]->text($sigbar);
+	$_[1]->reverse(1);
+	# Now lets color it:
+	if($n<3){
+		$_[1]->set_color_fg('red');
+	}elsif($n>=3 && $n < 7){
+		$_[1]->set_color_fg('yellow');
+	}elsif($n>=7 && $n < 10){
+		$_[1]->set_color_fg('green');
+	}elsif($n>=10 && $n < 15){
+		$_[1]->set_color_fg('green');
+	}elsif($n>=15 && $n<25){
+		$_[1]->set_color_fg('blue');
+	}
+	elsif($n>=25){
+		$_[1]->set_color_fg('white');
+	}
+	### UBERTOOTH SCAN? ###
+	if($ubton==1){ # scanning is on
+		my $ubtt = `cat ubt.out`;
+		$lubt::label->text($ubtt);
+	}
+}
+sub getbt{ ### Scan for all Bluetooth devices and 
+	my @bt = `cat bt.out`; ### Pull out relevant data:
+	$btdisp = ''; # what to display to the user:
+	foreach(@bt){
+		my @splt = split(/,/,$_);
+		if(!grep(/$splt[0]/,@bttds)){ # if it's not in bluetooth devices,
+			push(@bttds,$_);#  then push it in for logging
+			$btdc++;
+		}
+		# either way, it can be displayed because it was found:
+		$btdisp .= $_; # already has new-line
+	}
+	if($btdisp ne ''){ # then we have something to put in the window:
+		$winbt::label->text($btdisp);
+	}
+}
+sub parsedat{ ### Parse the satellite data ###
+      	 my $json = JSON::XS->new->utf8->pretty->allow_nonref;
+      	 %jhash = %{$json->decode ($_[0])};
+}
+sub eggsit{ ### QUIT CTRL+C "q" ###
+	my $i = 0;
+	my $quit = $cui->dialog(-message=>"Do you really want to exit?",-title=>"Thank You!",-buttons=>['yes','no']);
+	if($quit){
+		### SHALL WE LOG FILE? ###
+		my $loga = $cui->dialog(-message=>"Shall I Map your Travel?",-title=>"Map Plotting",-buttons=>['yes','no']);
+		if($loga){
+			my $date = localtime;
+			$date =~ s/ //g;
+			$date =~ s/:/-/g;
+			open(FLE,">>logs/html/logfile-$date.html"); # TODO altitude in GMAPS ?
+			printhtml('includes/html/top.html');
+			my @slatlon = split(/,/,$logaps[0]); # get starting lat and lon
+			my $slat = $slatlon[5];
+			my $slon = $slatlon[6];
+			my $map = lib::GMAPS->new($lat,$lon);
+			print FLE "var lat = $slat;\n";
+			print FLE "var lon = $slon;\n";
+			printhtml('includes/html/middle.html');
+			my $i = 0;
+			foreach(@logaps){ # All of my WiFi APs:
+				my @platlon = split(/,/,$_);# latitude and longitude for each marker object
+				print FLE $map->pos_mark($i,$platlon[5],$platlon[6],'wf') . "\n"; # sent
+				print FLE $map->con_str($platlon[0],$platlon[1],$platlon[2],$platlon[3],$platlon[4],$platlon[5],$platlon[6]) . "\n";
+				print FLE $map->info_win($i) ."\n"; # make the info window for the marker
+				$i++; # this little token keeps all map objects unique!
+			} # $i is still at cap from wifi shit:
+			foreach(@bttds){ # All of my Bluetooth Devices:
+				my @line = split(/,/,$_);
+				print FLE $map->pos_mark($i,$line[2],$line[3],'bt');
+				print FLE $map->con_str_bt($line[0],$line[1],$line[2],$line[3]);
+				print FLE $map->info_win($i);
+				$i++;
+			}
+			foreach(@wps){ # All my Waypoints:
+				my @line = split(/,/,$_);
+				print FLE $map->pos_mark($i,$line[1],$line[0],'wp');
+				print FLE $map->wp_str($line[0],$line[1],$line[2],$line[3],$line[4]);
+				print FLE $map->info_win($i);
+				$i++;
+			}
+			printhtml('includes/html/bottom.html');
+			foreach(@logaps){ # Print the APs under the map:
+				print FLE $_ . "<br />";
+			}
+			printhtml('includes/html/bottom_apdone.html');
+			foreach(@bttds){ # all Bluetooth devices found - period.
+				print FLE $_ . "<br />";
+			}
+			printhtml('includes/html/bottom_btdone.html');
+			foreach(@allsats){
+				print FLE $_ . "<br />";
+			}
+			printhtml('includes/html/bottom_satdone.html');
+			
+		}
+		# Kill Airodump-ng:
+		my @pid = `ps aux | grep "airodump.*capfiles" | awk '{print \$2}'`;
+		foreach(@pid){
+			system ("kill $_"); # had some hiccups here, better than killall
+		}
+		close FLE;
+		exit(0);
+	}
+}
+sub printhtml{ # slurp contents and print to file
+	my @html = `cat $_[0]`;
+	foreach(@html){
+		print FLE $_;
+	}
+}
+sub snapshot{ ### Take a snapshot of the surrounding area ###
+	$date =~ s/ /./g;
+	my $file = "logs/txt/wc." . $date . ".snapshot";
+	open(FLE,">$file");
+	print FLE "WARCARRIER Wardriving Location Snapshot\n -- taken " . 
+		localtime() . "\n-----------------------------\nLongitude: " . 
+		$lon . "\nLatitude: " . $lat . "\nAltitude: " . $alt . 
+		"\n\nBSSIDs:\n--------------\n" . $dump . "\n\n" . 
+		"Satellites:\n--------------\n". $sats . "\n". 
+		"Bluetooth devices:\n--------------\n" . $btdisp . "\n";
+	close FLE;
+	my $statusstring="Snapshot successfully taken!\nFile: ./" . $file;
+	$cui->error(-message=>$statusstring,-title=>"Snapshot of Surrounding Area");
+}
+sub help{ ### Simple Help Dialog ### 
+	$cui->dialog(-message=>"q: to quit\ns: for snapshots\ng: clear graph\nh: for help",-title=>"Help Options");
+}
+sub satinfo{ ### WHich satellite to query? ###
+	my $satquery = $cui->question(-question=>"Which satellite would you like more information on? Please choose PRNID:\n\n".$satsq,);
+	satdat($satquery);
+}
+sub satdat{ ### Display the information ###
+	my $sat = lib::SATINFO->new($_[0]);
+	$cui->dialog(-message=>"PRNID:" . $sat->satdata('PRN') . "\nInternational Code: " . $sat->satdata('INTCODE') . "\nNORAD ID: " . $sat->satdata('NORADID') . "\nLaunch Date: " . $sat->satdata('LD') . "\nNAVSTAR ID: " . $sat->satdata('NAVSTAR') . "\n\n" . $sat->satdata('TRIV'),-title=>"Satellite Info from NASA",-tfg=>"black",-tbg=>"yellow");
+}
+### Catchme-NG STUFF ###
+sub catchmeinput{
+	$catchme = $cui->question(-title=>"Catchme-NG!", -question=>"Please enter an ESSID or BSSID:");
+	$catch = 1;
+}
+sub catchme{
+	$catch = 0;
+	system ("play includes/sound/mp3.mp3 2>/dev/null &");
+	$cui->error(-message=>"Writing report file: \n".$catchme ."-".localtime()."-report.txt",-title=>"Catchme-NG found a match!");
+	my $file = "logs/txt/".$catchme . "-" . localtime() . "-report.txt";
+	$file =~ s/ /./g;
+	open(CME,">>$file");
+	print CME "WARCARRIER / Catchme-NG! Report for string: " . $catchme . "\n--------------------------\n";
+	print CME "Lat: " . $lat . "\n";
+	print CME "Lon: " . $lon . "\n";
+	print CME "Localtime: " . localtime() . "\n";
+	close CME;
+}
+sub usage{
+	if($_[0] eq 'dev'){
+		print "Cannot find your device! ($wfdev)\nTry doing \"airstop-ng wlanX && airmon-ng start wlanX\"\n"
+			. "where wlanX is your wireless device\n\n";
+	}
+	print "Usage: ./warcarrier -d <wlan device> -f <filename>\n";
+	exit;
+}
+sub waypoint{
+	my $msg = $cui->question(-title=>"WARCARRIER Waypoint Creation",-question=>"Please enter a description for this waypoint:");
+	$wpc++;
+	my $wp = $lon.",".$lat.",".$wpc.",".$date.",".$msg;
+	push(@wps,$wp);
+	$cui->status("Waypoint successfully created!");
+	sleep 1; # so they can see the status above
+}
+
+### UBEROOTH SPEC ANALYZER STUFF: ###
+sub startubt{ # start Ubertooth scanning:
+	system("./wbt_pi &");
+	$winubt = $cui->add('ubt','Window',-padtop=>2,-title=>"Bluetooth Spectrum Analyzer",-border=>1,-height=>36,-width=>99,-padleft=>10,-tfg=>"black",-tbg=>"yellow");
+	$lubt::label = $winubt->add('lubt','Label',-height=>36,-width=>99,-fg=>"yellow");
+	$lubt::label->focus();
+	$ubton=1;
+}
+sub stopubt{ # stop ubertooth scanning:
+	$cui->delete('ubt');
+	$ubton=0;
+	my $killcmd = 'ps aux | grep [w]bt | awk \'{print $2}\' | xargs kill'
+	system($killcmd); # stop scanner
+}

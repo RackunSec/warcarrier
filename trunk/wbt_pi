@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+open(UBTS,"spectool_raw|grep ': -[0-9]'|");
+while(<UBTS>){
+	my @bars= ( # from -100dBm to -70dBm (Reset Bars);
+		"        2408MHz 2416MHz 2424MHz 2432MHz 2440MHz 2448MHz 2456MHz 2464MHz 2472MHz",
+		"-100dBm","      -","      -","      -","      -"," -95dBm","      -","      -","      -","      -",
+		" -90dBm","      -","      -","      -","      -"," -85dBm","      -","      -","      -","      -",
+		" -80dBm","      -","      -","      -","      -"," -75dBm","      -","      -","      -","      -"," -70dBm",
+	); # [0] = 50, [1] = 60, [4] = 90 
+	my $l = $_;
+	$l =~ s/Ubert.*ne [0-9]+: //;
+	chomp $l;
+	my @lvls = split(/ /,$l);
+	for(my $i=0;$i<=$#lvls;$i++){
+		$lvls[$i] = abs($lvls[$i]);
+		$lvls[$i] = 100 - $lvls[$i]; # yields: 3,6,7,2,9,12
+		if($lvls[$i] < 0){
+			$lvls[$i] = 0; # not sure why this is needed ?
+		}
+		for(my$j=0;$j<=$#bars;$j++){ # loop $bars[]
+			if($bars[$j] !~ m/MHz/){
+				if($j<=($lvls[$i]-1)){ #
+					$bars[$j].="|"; # make a signal bar
+				}else{
+					$bars[$j].=" "; # make nothingQ
+				}
+			}
+		}
+	}
+	my $graph = "";
+	for(my$i=$#bars;$i>=0;$i--){
+		$graph .= $bars[$i]."\n";
+	}
+		# print the graph
+	open(FLE,">ubt.out"); # ubertooth output
+	print FLE $graph;
+	close(FLE);
+}	

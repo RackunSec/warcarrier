@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+system("rm logs/txt/* 2>/dev/null");
+system("rm logs/html/* 2>/dev/null");
+system("rm logs/capfiles/* 2>/dev/null");
+system("rm bt.* 2>/dev/null");
+system("rm gps.* 2>/dev/null");
+system("rm wc.* 2>/dev/null");
+print "Clean up completed.\n";
+system("killall airodump-ng 2>/dev/null");
+my $killcmd = "ps aux | grep [w]bt | awk '{print \$2}' | xargs kill";
+system($killcmd);
