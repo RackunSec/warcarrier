@@ -1,4 +1,4 @@
-#summary of Ubertooth plugin functionality
+#summary Ubertooth plugin functionality
 
 = Ubertooth =
 
