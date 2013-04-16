@@ -1,15 +1,40 @@
-#this is the manual.
+#summary This is the manual and how-to.
 
 = Installation =
+
+===dependencies (in Debian)===
+This should get us going:
+{{{
+cpan -i JSON::XS
+cpan -i Curses::UI
+apt-get install libpcap-dev iw build-essential sqlite-dev
+# some of the above names may need changed do apt-cache search fo them
+mkdir /tmp/aircrack && cd /tmp/aircrack
+svn co http://trac.aircrack-ng.org/svn/trunk/ new
+cd new
+make && make install
+}}}
+
+===Starting her up===
+
+Just make sure the terminal is wide enough:
+
+{{{
 tar vzxf warcarrier.tar.gz<br />
-./warcarrier
+iwconfig wlan0 mode monitor # should make mon0 - change wlan0 to your device
+./warcarrier -d mon0 - outputfile
+}}}
+
+You can also do {{{ ./start-wc.sh }}}
 
 = Key Commands =
 
-  * "h" for help.
+  * ~~"h" for help.~~
   * "s" for snapshot.
   * "g" to reset graph.
   * "q" OR "CTRL+C" to quit.
   * "i" extra satellite info.
   * "c" Catchme-NG! functionality
-  * "b" ~~add Bluetooth device at any time~~
+  * "u" Ubertooth Spectrum Analyzer
+  * "x" exit spectrum analyzer
+  * ~~"b" add Bluetooth device at any time~~
