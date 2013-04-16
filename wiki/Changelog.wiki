@@ -1,4 +1,21 @@
 #This is the change-log page
+
+= Changes 04.16.2013 =
+  * wcclean now takes an argument (all|sys|proc|logs)
+    * all - removes everything and stops runaway processes
+    * sys - removes system files of application
+    * proc - kills all runaway processes left behind by a bad exit from Curses::UI
+    * logs - removes all log files - just as previous version did
+  * Warcarrer now has support for Ubertooth - <a href="http://ubertooth.sourceforge.net/">http://ubertooth.sourceforge.net/</a> It relies on Dragorn's spectools_raw to pull raw data from the device: <a href"http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
+    * press (u) to access,
+    * press (x) to close Ubertooth window
+  * Cleaned up a lot of potentially - "uninitialized" variable errors in the code and added "use strict" 
+  * compacted code and added lots of comments
+  * New colors now defined
+  * Warcarrier main window now smaller to accommodate laptop (wide) screens.
+  * Added startup-script used in WarcarrierOS into tarball for automatically starting Warcarrier with "mon0" and "file" as arguments.
+  * added wubt_pl script that pulls and parses Ubertooth data from spectools_raw
+
 = Changes 03.04.2013 =
   * WARCARRIER starts Airodump-ng automatically
   * Command-Line paramters for -d device and -f csvfilename
