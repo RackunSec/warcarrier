@@ -13,7 +13,7 @@ sub aps{
 			my ($ls,$lm,$lh) = localtime; # local time
 			$spltAPs[2] =~ s/.* //;
 			my ($rh,$rm,$rs) = split(/:/,$spltAPs[2]); # report time	
-			$rs =~ s/^0//; $rm =~ s/^0//; $rh =~ s/^0//; # dafuq? lol!
+			foreach($rs,$rm,$rh){ $_ =~ s/^0//; }
 			if(($lh > $rh && $lm <= 1)||($lh == $rh && (($lm - $rm) < 2))){ # kinda crazy!
 				my $hash = {}; # im fuckkmning druibnk.
 				$hash->{'BSSID'} = $spltAPs[0];

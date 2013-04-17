@@ -9,15 +9,19 @@
 #
 # Please see README for GNU License.
 # 
-# NOTES: any hacking to thid file CAN be bad. curses in Perl
+# NOTES: any hacking to this file CAN be bad. curses in Perl
 #   is very delicate and will fail without returning errors
 #   if teh slightest thing goes wrong. In fact, if it does it
 #   without hacking, just restart it because it probabaly means
 #   that the buffer files haven't been made yet.
 #   If you see any "sleep"'s in here - that's why.
 #
-# This turned into a fuckin beast!
+# CLEANUP: please run "./wcclean proc" to destroy any left processes
+#   by Curses::UI failing before stopping them. This won't destory
+#   the log files, to do that do: "./wcclean logs" or "./wcclean all"
 # 
+# UBERTOOTH: this functionality takes the "raw" daya from the Ubertooth
+#   device using spectools_raw from Dragorn.
 #
 # My own modules:
 require lib::GMAPS;   # - create "map" objects
@@ -56,19 +60,25 @@ my $devchk = `iwconfig $wfdev`; # let's see if they passed a valid device,
 if($devchk eq ''){              #  so we can fail gracefully if so.
 	usage('dev');
 }
-system("airodump-ng $wfdev --write $filename 2>/dev/null &"); # start scanning wifi
+my $airtest = `ps aux | grep "airodump.*[c]apfiles" |wc -l`;
+if($airtest < 1){ # just in case Curses::UI - well, you know.
+	system("airodump-ng $wfdev --write $filename 2>/dev/null &"); # start scanning wifi
+}else{
+	die("Airtest FAILED\n");
+}
 $filename.="-01.csv"; # Airodump-ng does this to make unique files
 system("touch bt.out"); # create our bluetooth scanning file
-system("touch gps.TPV"); # create our bluetooth scanning file
-system("touch gps.SKY"); # create our bluetooth scanning file
+system("touch ubt.out"); # create our bluetooth spec-an file
+system("touch gps.TPV"); # create our gps TPV Packet file
+system("touch gps.SKY"); # create our gps SKY packet file
 
 my $cui = new Curses::UI(-color_support=>1); # create a curses object
-$cui->status("Please wait while the WARCARRIER initializes"); # please hold.
+$cui->status(-message=>"Please wait while the WARCARRIER initializes",-fg=>"white",-bold=>1,-bg=>"black"); # please hold.
 
 my @allsats; # for ALL satellites (HTML logging)
 my $gps = "NULL";
-my $lat = 0.00000;
-my $lon = 0.00000;
+my $lat = "0.00000N";
+my $lon = "0.00000W";
 my $alt = 0;
 my $dump = ''; # dump string for printing in window
 my $apc = 0; # AP Count for WiFi
@@ -102,6 +112,7 @@ local $winson::label;
 local $winsc::label;  
 local $winfix::progressbar;
 
+### These are channel bars ###
 local $windmp::label;
 local $winch11::label;
 local $winch10::label;
@@ -117,7 +128,83 @@ local $winch1::label;
 local $winch12::label;
 local $winch13::label;
 
-local $lubt::label; # this is for the ubertooth window's label
+### THESE ARE LABELS FOR THE UBERTOOTH RSSIs ###
+local $ubt2408::label;
+local $ubt2409::label;
+local $ubt2410::label; 
+local $ubt2411::label; 
+local $ubt2412::label; 
+local $ubt2413::label; 
+local $ubt2414::label; 
+local $ubt2415::label; 
+my @arrlabel; # retarded
+local $ubt2416::label; 
+local $ubt2417::label; 
+local $ubt2418::label; 
+local $ubt2419::label; 
+local $ubt2420::label; 
+local $ubt2421::label; 
+local $ubt2422::label; 
+local $ubt2423::label; 
+local $ubt2424::label; 
+local $ubt2425::label; 
+local $ubt2426::label; 
+local $ubt2427::label; 
+local $ubt2428::label; 
+local $ubt2429::label; 
+local $ubt2430::label; 
+local $ubt2431::label; 
+local $ubt2432::label; 
+local $ubt2433::label; 
+local $ubt2434::label; 
+local $ubt2435::label; 
+local $ubt2436::label; 
+local $ubt2437::label; 
+local $ubt2438::label; 
+local $ubt2439::label; 
+local $ubt2440::label; 
+local $ubt2441::label; 
+local $ubt2442::label; 
+local $ubt2443::label; 
+local $ubt2444::label; 
+local $ubt2445::label; 
+local $ubt2446::label; 
+local $ubt2447::label; 
+local $ubt2448::label; 
+local $ubt2449::label; 
+local $ubt2450::label; 
+local $ubt2451::label; 
+local $ubt2452::label; 
+local $ubt2453::label; 
+local $ubt2454::label; 
+local $ubt2455::label; 
+local $ubt2456::label; 
+local $ubt2457::label; 
+local $ubt2458::label; 
+local $ubt2459::label; 
+local $ubt2460::label; 
+local $ubt2461::label; 
+local $ubt2462::label; 
+local $ubt2463::label; 
+local $ubt2464::label; 
+local $ubt2465::label; 
+local $ubt2466::label; 
+local $ubt2467::label; 
+local $ubt2468::label; 
+local $ubt2469::label; 
+local $ubt2470::label; 
+local $ubt2471::label; 
+local $ubt2472::label; 
+=pod
+local $ubt2473::label; 
+local $ubt2474::label; 
+local $ubt2475::label; 
+local $ubt2476::label; 
+local $ubt2477::label; 
+local $ubt2478::label; 
+local $ubt2479::label; 
+local $ubt2480::label; 
+=cut
 my $winubt;
 my $ubton = 0;
 
@@ -131,7 +218,6 @@ local $winapc::label; # all AP count
 
 local $winclock::label; # the clock in the middle of the app
 
-#local $winbtc::label; # Bluetooth Count
 local $winbt::label; # The Bluetooth dump window!
 
 my $titlewid = $cui->add('titlew','Window',-border=>0,-height=>1,-width=>34);
@@ -181,43 +267,43 @@ $winsat::label->draw;
 my $widdmp = $cui->add('wifidmp','Window',-border=>1,-tbg=>"yellow",-tfg=>"black",-title=>'Collected WiFi Data',-height=>15,-x=>59,-y=>2,-width=>58);
 
 my $widch1 = $cui->add('ch1','Window',-border=>1,-title=>'01',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>47,-titlefullwidth=>1);
-$winch1::label = $widch1->add('ch1l','Label',-height=>17,-width=>7);
+$winch1::label = $widch1->add('ch1l','Label',-height=>10,-width=>7);
 $winch1::label->draw();
 my $widch2 = $cui->add('ch2','Window',-border=>1,-title=>'02',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>53,-titlefullwidth=>1);
-$winch2::label = $widch2->add('ch2l','Label',-height=>17,-width=>7);
+$winch2::label = $widch2->add('ch2l','Label',-height=>10,-width=>7);
 $winch2::label->draw();
 my $widch3 = $cui->add('ch3','Window',-border=>1,-title=>'03',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>59,-titlefullwidth=>1);
-$winch3::label = $widch3->add('ch3l','Label',-height=>17,-width=>7);
+$winch3::label = $widch3->add('ch3l','Label',-height=>10,-width=>7);
 $winch3::label->draw();
 my $widch4 = $cui->add('ch4','Window',-border=>1,-title=>'04',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>65,-titlefullwidth=>1);
-$winch4::label = $widch4->add('ch4l','Label',-height=>17,-width=>7);
+$winch4::label = $widch4->add('ch4l','Label',-height=>10,-width=>7);
 $winch4::label->draw();
 my $widch5 = $cui->add('ch5','Window',-border=>1,-title=>'05',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>71,-titlefullwidth=>1);
-$winch5::label = $widch5->add('ch5l','Label',-height=>17,-width=>7);
+$winch5::label = $widch5->add('ch5l','Label',-height=>10,-width=>7);
 $winch5::label->draw();
 my $widch6 = $cui->add('ch6','Window',-border=>1,-title=>'06',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>77,-titlefullwidth=>1);
-$winch6::label = $widch6->add('ch6l','Label',-height=>17,-width=>7);
+$winch6::label = $widch6->add('ch6l','Label',-height=>10,-width=>7);
 $winch6::label->draw();
 my $widch7 = $cui->add('ch7','Window',-border=>1,-title=>'07',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>83,-titlefullwidth=>1);
-$winch7::label = $widch7->add('ch7l','Label',-height=>17,-width=>7);
+$winch7::label = $widch7->add('ch7l','Label',-height=>10,-width=>7);
 $winch7::label->draw();
 my $widch8 = $cui->add('ch8','Window',-border=>1,-title=>'08',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>89,-titlefullwidth=>1);
-$winch8::label = $widch8->add('ch8l','Label',-height=>17,-width=>7);
+$winch8::label = $widch8->add('ch8l','Label',-height=>10,-width=>7);
 $winch8::label->draw();
 my $widch9 = $cui->add('ch9','Window',-border=>1,-title=>'09',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>95,-titlefullwidth=>1);
-$winch9::label = $widch9->add('ch9l','Label',-height=>17,-width=>7);
+$winch9::label = $widch9->add('ch9l','Label',-height=>10,-width=>7);
 $winch9::label->draw();
 my $widch10 = $cui->add('ch10','Window',-border=>1,-title=>'10',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>101,-titlefullwidth=>1);
-$winch10::label = $widch10->add('ch10l','Label',-height=>17,-width=>7);
+$winch10::label = $widch10->add('ch10l','Label',-height=>10,-width=>7);
 $winch10::label->draw();
 my $widch11 = $cui->add('ch11','Window',-border=>1,-title=>'11',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>107,-titlefullwidth=>1);
-$winch11::label = $widch11->add('ch11l','Label',-width=>7,-height=>17);
+$winch11::label = $widch11->add('ch11l','Label',-width=>7,-height=>10);
 $winch11::label->draw();
 my $widch12 = $cui->add('ch12','Window',-border=>1,-title=>'12',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>113,-titlefullwidth=>1);
-$winch12::label = $widch1->add('ch12l','Label',-height=>17,-width=>7);
+$winch12::label = $widch1->add('ch12l','Label',-height=>10,-width=>7);
 $winch12::label->draw();
 my $widch13 = $cui->add('ch13','Window',-border=>1,-title=>'13',-y=>17,-width=>6,-height=>10,-fg=>"red",-x=>119,-titlefullwidth=>1);
-$winch13::label = $widch2->add('ch13l','Label',-height=>17,-width=>7);
+$winch13::label = $widch2->add('ch13l','Label',-height=>10,-width=>7);
 $winch13::label->draw();
 
 ## GRAPHING WINDOW:
@@ -242,9 +328,6 @@ $winopn::label->draw;
 my $widapc = $cui->add('apc', 'Window',-border => 1,-title=>'APs',-height=>1,-width=>8,-y=>14,-x=>117);
 $winapc::label = $widapc->add('opnc','Label',-text=>$apc,-width=>8);
 $winapc::label->draw;
-#my $widbtc = $cui->add('btc', 'Window',-border => 1,-title=>'Blu',-height=>1,-width=>8,-y=>50,-x=>117);
-#$winbtc::label = $widbtc->add('btcl','Label',-text=>$btdc,-width=>8);
-#$winbtc::label->draw;
 
 ## LABELS, PROG BARS, ETC
 $windmp::label = $widdmp->add('dmp','Label',-text=>'Retrieving Data',-bold=>0,-width=>100,-height=>33);
@@ -256,13 +339,10 @@ $winbt::label = $widbt->add('winbt','Label',-text=>"No remote devices found.",-i
 $winbt::label->draw();
 
 my $cmds = $cui->add('cmds','Window',-border=>0,-y=>36,-height=>1,-padleft=>1);
-$cmds->add('cmdl','Label',-bold=>1,-text=>" Keyboard Commands: (q)uit/CTRL+C, (s)napshot, clear (g)raph, (h)elp, satellite (i)nfo, (c)atchme-NG!, map a (w)aypoint",-reverse=>1);
-
-### END WINDOWS ###
+$cmds->add('cmdl','Label',-bold=>1,-text=>" Commands: (q)uit, (s)napshot, clear (g)raph, satellite (i)nfo, (c)atchme-NG!, map (w)aypoint, bl(u)etooth spectrum",-reverse=>1);
 
 ### KEY BINDINGS ###
 $cui->set_binding( \&clrgraph, "g"); # Clear Graph
-$cui->set_binding( \&help, "h"); # h for help
 $cui->set_binding( \&eggsit, "\cC"); # literally means CTRL+C (Eggsit)
 $cui->set_binding( \&eggsit, "q"); # eggsit
 $cui->set_binding( \&snapshot, "\cS"); # literally means CTRL+S (Snapshots)
@@ -273,8 +353,9 @@ $cui->set_binding( \&stopubt, "x"); # c Catchme-NG
 $cui->set_binding( \&startubt, "u"); # c Catchme-NG
 $cui->set_binding( \&waypoint, "w"); # c Catchme-NG
 
+### END WINDOWS ###
 #my $n = '('; # uncomment these two for ultra speed! (gps cannot keep up really though.
-#$cui->set_timer(1, \&getgpsd,$n); # will do this each second:
+#$cui->set_timer(1, \&getgpsd,$n); #
 
 $cui->set_timer('update_timer',\&getgpsd,0); # will do this each second:
 $cui->mainloop();
@@ -293,9 +374,9 @@ sub getgpsd{
 	}else{
 		# it's already running! 
 	}
-	if($init == 1){ # TODO check here for file exists and pluck it
-		sleep 3; # 7 more seconds to slide away, somewhere in the sun... my head is in the sun...
-		$init = 0;
+	if($init == 1){ #
+		sleep 5;   # 5 more seconds to slide away,
+		$init = 0; # somewhere in the sun... my head is in the sun...
 	}
 	$sats = "";
 	my $satcount=0;
@@ -309,19 +390,22 @@ sub getgpsd{
 	$lat = $jhash{'lat'};
 	my $cli;
 	my $spe;
-	if($jhash{'climb'} > 1){
-		$cli = $jhash{'climb'};
-	}else{
-		$cli = 0.00;
+	if($jhash{'climb'}){ # sometimes doesn't exist
+		if($jhash{'climb'} > 1){
+			$cli = $jhash{'climb'};
+		}else{
+			$cli = 0.00;
+		}
 	}
-	if($jhash{'speed'} > 1){
-		$spe = $jhash{'speed'};
-	}else{
-		$spe = 0.00;
+	if($jhash{'speed'}){ # sometimes doesn't exist
+		if($jhash{'speed'} > 1){
+			$spe = $jhash{'speed'};
+		}else{
+			$spe = 0.00;
+		}
 	}
 	my $tra = $jhash{'track'};
-	## GET SKY PACKET
-	parsedat($gps->packet('SKY'));
+	parsedat($gps->packet('SKY')); ## GET SKY PACKET
 	$satsq = ""; # reset satellite list to recreate:
 	for(my $i=0;$i<=32;$i++){
 		if($jhash{'satellites'}[$i]){ # does it exist?
@@ -345,10 +429,12 @@ sub getgpsd{
 		}
 	}
 	$cui->nostatus();
-	$lat =~ s/-//;
-	$lon =~ s/-//;
-	$lat.='N';
-	$lon.='W';
+	if($lat && $lon){
+		$lat =~ s/-//;
+		$lon =~ s/-//;
+		$lat.='N';
+		$lon.='W';
+	} # Here I update your window's labels with some data:
 	$winlon::label->text($lon);
 	$winlat::label->text($lat);
 	$winalt::label->text($alt);
@@ -373,8 +459,7 @@ sub getgpsd{
 		$widfix->title("No Fix (No satellites online)");
 		
 	}
-	# We are all done updating the windows, lets refocus the beefy one:
-	getwifi();
+	getwifi(); # get some WiFi data
 }
 sub getwifi{ ### GET WIFI STATS ###
 	$dump = "";
@@ -396,8 +481,8 @@ sub getwifi{ ### GET WIFI STATS ###
 		my $essid = $h->{'ESSID'};
 		$essid =~ s/'/\'/g; # fix ESSIDs
 		$dump .= $h->{'BSSID'} . ", " . $h->{'CH'} . ", " . $h->{'PWR'} . ", " . $h->{'SEC'} . ", " . $essid . "\n"; 
-		if(!$lat){ $lat = 0.00000; }
-		if(!$lon){ $lon = 0.00000; }
+		if(!$lat){ $lat = "0.00000N"; }
+		if(!$lon){ $lon = "0.00000W"; }
 		if($lat ne "" && $lon ne "") { # let's not log if there's no coords so that JS doesn't break for the Maps:
 			my $logaps = $h->{'BSSID'} . ", " . $h->{'CH'} . ", " . $h->{'PWR'} . ", " . $h->{'SEC'} . ", " . $essid . "," . $lat . "," . $lon;
 			$logaps =~ s/, /,/g; # remove spaces from commas
@@ -497,18 +582,23 @@ sub clrgraph{ ## CLEAR THE GRAPH ##
 	@lines = ("05- ","10  ","15  ","20  ","25  ","35  ","50+ ");
 }
 sub sigbar{ ### My Channel Signal Bars ###
+	# bar is 10 height, so (10-$_[0]) == spacescount
+	my $spaces = (9 - $_[0]);
 	my $sigbar = '';
-	my $i = 0;
 	my $n = 0;
-	#my $sigdiv = int($_[0] / 2); # per every 2:
-	for($i=0;$i<$_[0];$i++){
-		$sigbar .= "    \n";
+	if($spaces > 0){ # 10 - 7 = 3
+		for(my $i=0;$i<$spaces;$i++){
+			$sigbar .= "\n"; # add spaces on top
+		}
+	}
+	for(my $i=0;$i<$_[0];$i++){
+		$sigbar .= "    \n"; # add signal on bottom
 		$n++;
 	}
 	$_[1]->text($sigbar);
 	$_[1]->reverse(1);
 	# Now lets color it:
-	if($n<3){
+	if($n<3){ # color the bars for significance:
 		$_[1]->set_color_fg('red');
 	}elsif($n>=3 && $n < 7){
 		$_[1]->set_color_fg('yellow');
@@ -522,11 +612,39 @@ sub sigbar{ ### My Channel Signal Bars ###
 	elsif($n>=25){
 		$_[1]->set_color_fg('white');
 	}
-	### UBERTOOTH SCAN? ###
+	### UBERTOOTH SCAN ###
 	if($ubton==1){ # scanning is on
-		my $ubtt = `cat ubt.out`;
-		$lubt::label->text($ubtt);
+		my @bars = lines2bars();
+		my $n=0;
+		@arrlabel=( # this is sad how if this is a "global" Perl cannot use it:
+			$ubt2408::label,$ubt2409::label,$ubt2410::label,$ubt2411::label,$ubt2412::label,$ubt2413::label,$ubt2414::label,$ubt2415::label
+			,$ubt2416::label,$ubt2417::label,$ubt2418::label,$ubt2419::label,$ubt2420::label,$ubt2421::label,
+        		$ubt2422::label,$ubt2423::label,$ubt2424::label,$ubt2425::label,$ubt2426::label,$ubt2427::label,$ubt2428::label,
+        		$ubt2429::label,$ubt2430::label,$ubt2431::label,$ubt2432::label,$ubt2433::label,$ubt2434::label,$ubt2435::label,
+        		$ubt2436::label,$ubt2437::label,$ubt2438::label,$ubt2439::label,$ubt2440::label,$ubt2441::label,$ubt2442::label,
+        		$ubt2443::label,$ubt2444::label,$ubt2445::label,$ubt2446::label,$ubt2447::label,$ubt2448::label,$ubt2449::label,
+        		$ubt2450::label,$ubt2451::label,$ubt2452::label,$ubt2453::label,$ubt2454::label,$ubt2455::label,$ubt2456::label,
+        		$ubt2457::label,$ubt2458::label,$ubt2459::label,$ubt2460::label,$ubt2461::label,$ubt2462::label,$ubt2463::label,
+        		$ubt2464::label,$ubt2465::label,$ubt2466::label,$ubt2467::label,$ubt2468::label,$ubt2469::label,$ubt2470::label,
+        		$ubt2471::label,$ubt2472::label);
+=pod
+,$ubt2473::label,$ubt2474::label,$ubt2475::label,$ubt2476::label,$ubt2477::label,
+        		$ubt2478::label,$ubt2479::label,$ubt2480::label); # i'm looking forward to defining this fucking thing everywhere.
+=cut
+		foreach(@arrlabel){
+			$_->text($bars[$n]);
+			$n++;
+			ubtcolor($_);
+		}
 	}
+}
+sub ubtcolor{
+	my $str=$_[0]->get();
+	my $cnt=()=$str =~ / /g;
+	$_[0]->set_color_fg("red") if ($cnt<10);
+	$_[0]->set_color_fg("orange") if ($cnt>=10 && $cnt<20);
+	$_[0]->set_color_fg("yellow") if ($cnt>=20 && $cnt <=25);
+	$_[0]->set_color_fg("green") if ($cnt > 25);
 }
 sub getbt{ ### Scan for all Bluetooth devices and 
 	my @bt = `cat bt.out`; ### Pull out relevant data:
@@ -550,10 +668,11 @@ sub parsedat{ ### Parse the satellite data ###
 }
 sub eggsit{ ### QUIT CTRL+C "q" ###
 	my $i = 0;
-	my $quit = $cui->dialog(-message=>"Do you really want to exit?",-title=>"Thank You!",-buttons=>['yes','no']);
+	my $quit = $cui->dialog(-message=>"Do you really want to exit?",-title=>"Thank You!",-buttons=>['yes','no'],-bg=>"black",-fg=>"white",-bold=>1);
 	if($quit){
+		stopubt(); # stop Ubertooth if quit from that screen.
 		### SHALL WE LOG FILE? ###
-		my $loga = $cui->dialog(-message=>"Shall I Map your Travel?",-title=>"Map Plotting",-buttons=>['yes','no']);
+		my $loga = $cui->dialog(-message=>"Shall I Map your Travel?",-title=>"Map Plotting",-buttons=>['yes','no'],-bold=>1,-bg=>"black",-fg=>"white");
 		if($loga){
 			my $date = localtime;
 			$date =~ s/ //g;
@@ -607,7 +726,7 @@ sub eggsit{ ### QUIT CTRL+C "q" ###
 		# Kill Airodump-ng:
 		my @pid = `ps aux | grep "airodump.*capfiles" | awk '{print \$2}'`;
 		foreach(@pid){
-			system ("kill $_"); # had some hiccups here, better than killall
+			system ("kill $_");
 		}
 		close FLE;
 		exit(0);
@@ -632,9 +751,6 @@ sub snapshot{ ### Take a snapshot of the surrounding area ###
 	close FLE;
 	my $statusstring="Snapshot successfully taken!\nFile: ./" . $file;
 	$cui->error(-message=>$statusstring,-title=>"Snapshot of Surrounding Area");
-}
-sub help{ ### Simple Help Dialog ### 
-	$cui->dialog(-message=>"q: to quit\ns: for snapshots\ng: clear graph\nh: for help",-title=>"Help Options");
 }
 sub satinfo{ ### WHich satellite to query? ###
 	my $satquery = $cui->question(-question=>"Which satellite would you like more information on? Please choose PRNID:\n\n".$satsq,);
@@ -681,15 +797,127 @@ sub waypoint{
 
 ### UBEROOTH SPEC ANALYZER STUFF: ###
 sub startubt{ # start Ubertooth scanning:
+	return if($ubton==1);
 	system("./wbt_pi &");
-	$winubt = $cui->add('ubt','Window',-padtop=>2,-title=>"Bluetooth Spectrum Analyzer",-border=>1,-height=>36,-width=>99,-padleft=>10,-tfg=>"black",-tbg=>"yellow");
-	$lubt::label = $winubt->add('lubt','Label',-height=>36,-width=>99,-fg=>"yellow");
-	$lubt::label->focus();
+	$winubt = $cui->add('ubt','Window',-y=>1,-title=>"Bluetooth Spectrum Analyzer",-border=>1,-height=>35,-width=>120,-padleft=>15,-tfg=>"black",-tbg=>"yellow");
+	my $ldbm = $winubt->add('ldbm','Label',-height=>35,-width=>7,-fg=>"white",-text=>"-70dBm \n-\n--\n---\n--\n-75dBm\n-\n--\n---\n--\n-80dBm\n-\n--\n---\n--\n-85dBm\n-\n--\n---\n--\n-90dBm\n-\n--\n---\n--\n-95dBm\n-\n--\n---\n--\n-100dBm",-x=>0,-bold=>1);
+	my $lghz = $winubt->add('lghz','Label',-height=>1,-width=>99,-fg=>"white",-text=>"2400MHz 2408MHz 2416MHz 2424MHz 2432MHz 2440MHz 2448MHz 2456MHz 2464MHz 2472MHz",-x=>8,-bold=>1,-y=>31);
+	my $lclose = $winubt->add('lclose','Label',-height=>1,-fg=>"white",-text=>"\t\t\t\t\t\t\t\t\t(x) to close",-x=>1,-padtop=>32,-width=>105);
+	## Build new labels: ##
+	$ubt2408::label = $winubt->add('2408','Label',-height=>30,-width=>1,-reverse=>1,-fg=>"yellow",-y=>1,-x=>8);
+	$ubt2409::label = $winubt->add('2409','Label',-height=>30,-width=>2,-reverse=>1,-fg=>"green",-y=>1,-x=>9);
+	$ubt2410::label = $winubt->add('2410','Label',-height=>30,-width=>3,-reverse=>1,-fg=>"green",-y=>1,-x=>10);
+	$ubt2411::label = $winubt->add('2411','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>11);
+	$ubt2412::label = $winubt->add('2412','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>12);
+	$ubt2413::label = $winubt->add('2413','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>13);
+	$ubt2414::label = $winubt->add('2414','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>14);
+	$ubt2415::label = $winubt->add('2415','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>15);
+	$ubt2416::label = $winubt->add('2416','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>16);
+	$ubt2417::label = $winubt->add('2417','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>17);
+	$ubt2418::label = $winubt->add('2418','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>18);
+	$ubt2419::label = $winubt->add('2419','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>19);
+	$ubt2420::label = $winubt->add('2420','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>20);
+	$ubt2421::label = $winubt->add('2421','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>21);
+	$ubt2422::label = $winubt->add('2422','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>22);
+	$ubt2423::label = $winubt->add('2423','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>23);
+	$ubt2424::label = $winubt->add('2424','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>24);
+	$ubt2425::label = $winubt->add('2425','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>25);
+	$ubt2426::label = $winubt->add('2426','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>26);
+	$ubt2427::label = $winubt->add('2427','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>27);
+	$ubt2428::label = $winubt->add('2428','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>28);
+	$ubt2429::label = $winubt->add('2429','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>29);
+	$ubt2430::label = $winubt->add('2430','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>30);
+	$ubt2431::label = $winubt->add('2431','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>31);
+	$ubt2432::label = $winubt->add('2432','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>32);
+	$ubt2433::label = $winubt->add('2433','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>33);
+	$ubt2434::label = $winubt->add('2434','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>34);
+	$ubt2435::label = $winubt->add('2435','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>35);
+	$ubt2436::label = $winubt->add('2436','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>36);
+	$ubt2437::label = $winubt->add('2437','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>37);
+	$ubt2438::label = $winubt->add('2438','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>38);
+	$ubt2439::label = $winubt->add('2439','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>39);
+	$ubt2440::label = $winubt->add('2440','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>40);
+	$ubt2441::label = $winubt->add('2441','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>41);
+	$ubt2442::label = $winubt->add('2442','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>42);
+	$ubt2443::label = $winubt->add('2443','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>43);
+	$ubt2444::label = $winubt->add('2444','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>44);
+	$ubt2445::label = $winubt->add('2445','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>45);
+	$ubt2446::label = $winubt->add('2446','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>46);
+	$ubt2447::label = $winubt->add('2447','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>47);
+	$ubt2448::label = $winubt->add('2448','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>48);
+	$ubt2449::label = $winubt->add('2449','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>49);
+	$ubt2450::label = $winubt->add('2450','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>50);
+	$ubt2451::label = $winubt->add('2451','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>51);
+	$ubt2452::label = $winubt->add('2452','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>52);
+	$ubt2453::label = $winubt->add('2453','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>53);
+	$ubt2454::label = $winubt->add('2454','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>54);
+	$ubt2455::label = $winubt->add('2455','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>55);
+	$ubt2456::label = $winubt->add('2456','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>56);
+	$ubt2457::label = $winubt->add('2457','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>57);
+	$ubt2458::label = $winubt->add('2458','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>58);
+	$ubt2459::label = $winubt->add('2459','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>59);
+	$ubt2460::label = $winubt->add('2460','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>60);
+	$ubt2461::label = $winubt->add('2461','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>61);
+	$ubt2462::label = $winubt->add('2462','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>62);
+	$ubt2463::label = $winubt->add('2463','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"green",-y=>1,-x=>63);
+	$ubt2464::label = $winubt->add('2464','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>64);
+	$ubt2465::label = $winubt->add('2465','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>65);
+	$ubt2466::label = $winubt->add('2466','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>66);
+	$ubt2467::label = $winubt->add('2467','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>67);
+	$ubt2468::label = $winubt->add('2468','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>68);
+	$ubt2469::label = $winubt->add('2469','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>69);
+	$ubt2470::label = $winubt->add('2470','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>70);
+	$ubt2471::label = $winubt->add('2471','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>71);
+	$ubt2472::label = $winubt->add('2472','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>72);
+	
+	my $blue = $winubt->add('blue','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"blue",-y=>1,-x=>83,-text=>" ");
+	my $bluedbm = $winubt->add('bluedbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>1,-x=>84,-text=>">-75dBm");
+	my $green = $winubt->add('green','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"green",-y=>2,-x=>83,-text=>" ");
+	my $greendbm = $winubt->add('greendbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>2,-x=>84,-text=>"-85~80dBm");
+	my $yellow = $winubt->add('yellow','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"yellow",-y=>3,-x=>83,-text=>" ");
+	my $yellowdbm = $winubt->add('yellowdbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>3,-x=>84,-text=>"-81~90dBm");
+	my $red = $winubt->add('red','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"red",-y=>4,-x=>83,-text=>" ");
+	my $reddbm = $winubt->add('reddbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>4,-x=>84,-text=>"<-91dBm");
+
+=pod # unfortunately, Curses::UI is a big clunky piece of garbage. Deosn;t report errors, can't do globals, etc. 
+	# this piece of code would have saved 80 lines, but cannot be implemented in Curses::UI's current "state"
+	# not sure why the author didn;t give a fuck about errors. I mean, seriously.
+	my $m=8;
+	@arrlabel=($ubt2408::label,$ubt2409::label,$ubt2410::label,$ubt2411::label,$ubt2412::label,$ubt2413::label,$ubt2414::label,$ubt2415::label);
+	foreach(@arrlabel){
+		my $n = $m; # 2408
+		$n += 2400;
+		$_ = $winubt->add("$n","Label",-height=>30,-width=>4,-reverse=>1,-y=>1,-x=>$m,-border=>1);
+		$m++;
+	}
+=cut		
 	$ubton=1;
+	$winubt->focus();
+}
+sub lines2bars{ # pass me an array plz
+	my @lines = `cat ubt.out`;
+	my @lines2;
+	my $str = ""; # initialize our string
+	#for(my$i=0;$i<=length($lines[$#lines]);$i++){ # we strive until we reach NULL
+	for(my$i=0;$i<=80;$i++){ # we strive until we reach NULL
+		for(my$j=0;$j<=$#lines;$j++){
+			my $s = substr($lines[$j],0,1); # get the element
+			$lines[$j]=~s/^.//; # remove the element
+			if($s =~ m/P/){
+				$s =~ s/P/ \n/; # make it a printing space
+			}else{
+				$s = "\n"; # make it a non printing newline
+			}
+	                $str.=$s;
+	        }
+	        push(@lines2,$str); # something like "\n\n_\n_\n_\n"
+		$str=""; # reset the string
+	}
+	return(@lines2); # done.
 }
 sub stopubt{ # stop ubertooth scanning:
 	$cui->delete('ubt');
 	$ubton=0;
-	my $killcmd = 'ps aux | grep [w]bt | awk \'{print $2}\' | xargs kill'
+	my $killcmd = "ps aux | grep [s]pectool | awk '{print \$2}' | xargs kill 2>/dev/null";
 	system($killcmd); # stop scanner
 }
