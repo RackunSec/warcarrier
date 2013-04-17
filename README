@@ -4,13 +4,11 @@ _____________
 1.# USAGE ###==>
 ~~~~~~~~~~~~~
 start:
-	./warcarrier -d <wlan device> -b <bluetooth device (Optional)> -f <filename for airodump>
+	./warcarrier -d <wlan device> -f <filename for airodump>
 
 ____________________________________
 2.# CONTROLS in Instrument Panel ###==>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-help: (help dialog)
-	"h"
 quit: (gtfo)
 	"q" or CTRL+C or CTRL+X
 snapshot: (Take a snapshot of your surrounding area's devices)
