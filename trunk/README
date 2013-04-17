@@ -21,8 +21,8 @@ satellite details:
 	"i"
 Catchme-NG:
 	"c"
-Add Bluetooth device any time during wardriving scan:
-	"b"
+Ubertooth Spec analyzer:
+	"u" and then "x" to exit it.
 
 _____________
 3.# FILES ###==>
@@ -34,6 +34,7 @@ _____________
 ./logs/(txt|html)/* - log files in txt or HTML format
 ./bt.out - temporary Bluetooth buffer file -- Bluetooth scanning is really slow!
 ./gps.(TPV|SKY) - temporary GPS packets buffer file -- polling the GPS device is slow!
+./ubt.out - Ubertooth output
 ./capfiles - packet capture files made by Airodump-ng
 ./wcclean - cleans up all messes and erases all trace of scanning.
-
+./wcstartup.sh - autostart Warcarrier with wlan0 and /dev/ttyUSB0 (for WEAKERTH4N and WarcarrierOS)
