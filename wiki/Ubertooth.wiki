@@ -43,8 +43,12 @@ The lines are then made like so:
 
 Then I simply reverse them into spaces with <a href="http://search.cpan.org/~mdxi/Curses-UI-0.9609/">Curses::UI</a>'s {{{ -reverse=>1 }}} attribute to the Label object and display them with the corresponding value to the left and a small key in the top right with color coded lines.
 
+This gives a nice clean "zoomed" view of the spectrum, which makes finding a spectral mask tough, but is most accurate because we see _all_ values from -100dBm up to -70dBm. 
+
 Each bar is a Curses::UI Label object, which is kind of clunky, but works. So to do this, I used simple logic/magic to convert these bars into one-line bars in a new array, which I invented with a dry-erase marker on my large bathroom mirror.
- 
+
+<img src="http://warcarrier.org/images/wcapp.png"/>
+
 == Spectools ==
 <a href="http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
 
