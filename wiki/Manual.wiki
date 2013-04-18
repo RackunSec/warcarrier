@@ -54,7 +54,7 @@ This utility takes the argument (all|logs|sys|proc)
   * ~~"*h*" for help.~~
 
 = Logging =
-All logs will be kept in the {{{ logs/ }}} directory. When Warcarrier finds an AP via Catchme-NG there will be a text log in {{{./logs/txt }}} When Warcarrier asks to "log your adventure", it will be a log in {{{ ./logs/html}}} as an HTML file with the Google Map.
+All logs will be kept in the {{{ logs/ }}} directory. When Warcarrier finds an AP via Catchme-NG there will be a text log in {{{./logs/txt }}} When Warcarrier asks to "log your adventure", it will be a log in {{{ ./logs/html}}} as an HTML file with the Google Map. ./logs/capfiles are the packet capture files from Airodump-NG and ./logs/bluetooth are the capture files from the Ubertooth device.
 
 =Files=
   * *wcstartup.sh* - Autostart script for WarcarrierOS and Weakerth4n Linux - This script will start warcarrier with {{{ -d mon0 -f file }}}
