@@ -30,7 +30,7 @@ You can also do {{{ ./wcstartup.sh }}}
 
 ===House Cleaning +++important===
 
-If the Application stops for no apparent reason - this is the result of Curses::UI, the daemons won't runaway! They will be reconnected to Warcarrier upon restart. If you restart warcarrier, it will not spwan a second process for Airodump-NG, Bluetooth, or GPS. It uses the environment (ps aux) to check if they are already running - please ignore the second "Please wait..." status message that will display, this is just the application checking for dependencies.<br />If, however, you do not want to restart Warcarrier, you should use the Warcarrier cleanup utility {{{ wcclean }}}
+If the Application stops for no apparent reason - this is the result of Curses::UI, the daemons won't runaway! They will be reconnected to Warcarrier upon restart. If you restart warcarrier, it will not spwan a second process for Airodump-NG, Bluetooth, or GPS. It uses the environment (ps aux) to check if they are already running - please ignore the second "Please wait..." status message that will display, this is just the application checking for dependencies.<br /><br />If, however, you do not want to restart Warcarrier after a crash, you should use the Warcarrier cleanup utility {{{ wcclean }}}
 
 This utility takes the argument (all|logs|sys|proc)
  * *all* - stops ALL runaway processes and removes ALL logs
