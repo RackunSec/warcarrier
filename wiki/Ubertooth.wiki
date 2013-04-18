@@ -47,7 +47,13 @@ This gives a nice clean "zoomed" view of the spectrum, which makes finding a spe
 
 Each bar is a Curses::UI Label object, which is kind of clunky, but works. So to do this, I used simple logic/magic to convert these bars into one-line bars in a new array, which I invented with a dry-erase marker on my large bathroom mirror.
 
+== Recording ==
+
+In the image below we can see a sample being "recorded" of the site, or surrounding area. This logs the current GPS corrdinates and timestamp with *each* RSSI value seen by the antenna:
+
 <img src="http://warcarrier.org/images/wcapp.png"/>
+
+The log is a simple CSV file, which can then be "replayed" at any time in the future.
 
 == Spectools ==
 <a href="http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
