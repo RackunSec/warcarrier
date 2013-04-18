@@ -36,6 +36,9 @@ while(<UBTS>){
 		$graph .= $bars[$i]."\n";
 	}
 		# print the graph
+	open(UBT,">ubt.raw"); # ubertooth RAW data for "Recording"
+	print UBT $l . "\n";
+	close(UBT);
 	open(FLE,">ubt.out"); # ubertooth output
 	print FLE $graph;
 	close(FLE);
