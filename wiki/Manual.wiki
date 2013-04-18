@@ -47,6 +47,7 @@ This utility takes the argument (all|logs|sys|proc)
   * "*c*" Catchme-NG! functionality
   * "*u*" Ubertooth Spectrum Analyzer
   * "*x*" exit spectrum analyzer
+  * "*r*" Begin/End "Recording" of Bluetooth Spectrum
 
   * *DEPRECATED*
   * ~~"*b*" add Bluetooth device at any time~~
