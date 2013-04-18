@@ -775,7 +775,7 @@ sub satinfo{ ### WHich satellite to query? ###
 }
 sub satdat{ ### Display the information ###
 	my $sat = lib::SATINFO->new($_[0]);
-	$cui->dialog(-message=>"PRNID:" . $sat->satdata('PRN') . "\nInternational Code: " . $sat->satdata('INTCODE') . "\nNORAD ID: " . $sat->satdata('NORADID') . "\nLaunch Date: " . $sat->satdata('LD') . "\nNAVSTAR ID: " . $sat->satdata('NAVSTAR') . "\n\n" . $sat->satdata('TRIV'),-title=>"Satellite Info from NASA",-tfg=>"black",-tbg=>"yellow");
+	$cui->dialog(-height=>100,-width=>100,-message=>"PRNID:" . $sat->satdata('PRN') . "\nInternational Code: " . $sat->satdata('INTCODE') . "\nNORAD ID: " . $sat->satdata('NORADID') . "\nLaunch Date: " . $sat->satdata('LD') . "\nNAVSTAR ID: " . $sat->satdata('NAVSTAR') . "\n\n" . $sat->satdata('TRIV'),-title=>"Satellite Info from NASA",-tfg=>"black",-tbg=>"yellow");
 }
 ### Catchme-NG STUFF ###
 sub catchmeinput{
@@ -820,7 +820,7 @@ sub startubt{ # start Ubertooth scanning:
 		$udisp = 1; # turn on display for Uberooth Boolean (used for recording)
 	}
 	return if($ubton==1);
-	system("./wbt_pi &");
+	system("./uber2th &");
 	$winubt = $cui->add('ubt','Window',-y=>1,-title=>"Bluetooth Spectrum Analyzer",-border=>1,-height=>35,-width=>120,-padleft=>15,-tfg=>"black",-tbg=>"yellow");
 	my $ldbm = $winubt->add('ldbm','Label',-height=>35,-width=>7,-fg=>"white",-text=>"-70dBm \n-\n--\n---\n--\n-75dBm\n-\n--\n---\n--\n-80dBm\n-\n--\n---\n--\n-85dBm\n-\n--\n---\n--\n-90dBm\n-\n--\n---\n--\n-95dBm\n-\n--\n---\n--\n-100dBm",-x=>0,-bold=>1);
 	my $lghz = $winubt->add('lghz','Label',-height=>1,-width=>99,-fg=>"white",-text=>"2400MHz 2408MHz 2416MHz 2424MHz 2432MHz 2440MHz 2448MHz 2456MHz 2464MHz 2472MHz",-x=>8,-bold=>1,-y=>31);
@@ -922,9 +922,13 @@ sub startubt{ # start Ubertooth scanning:
 sub lines2bars{ # pass me an array plz
 	if($record==1){ # show that we are recording
 		$f++; # frames
-		$rec::label->text("*Recording: ".$f." frames"); # blink on
+		$rec::label->text("*Recording: ".$f." frames");
 	}
 	my @lines = `cat ubt.out`;
+	if($record==1){ # we are recording, let's print the file:
+		my $raw = `cat ubt.raw`;
+		print UBT localtime().",".$lat.",".$lon.",".$raw; # nice.
+	}
 	my @lines2;
 	my $str = ""; # initialize our string
 	#for(my$i=0;$i<=length($lines[$#lines]);$i++){ # we strive until we reach NULL
@@ -953,9 +957,11 @@ sub stopubt{ # stop ubertooth scanning:
 }
 sub rec{
 	if($record==0 && $udisp==1){ #if Ubertooth display is ON
+		open(UBT,">logs/bluetooth/ubt.csv"); # this is where I store the log
 		$record=1; # turn it on. turn it on and all the way up!
 		# do record here $date.$lon.$lat.$btdump
 	}else{
+		close(UBT);
 		$record=0; # turn it off, we are done recording
 		$f=0; # frame count reset
 		$rec::label->text(""); # just in case we stop when it says "*Recording*"
