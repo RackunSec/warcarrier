@@ -1,4 +1,4 @@
-#Known working hardware
+#summary Known-working hardware
 
 = 802.11 =
   * SR71e AR9280 ath9k - <a href="http://wiki.ubnt.com/SR71e_upgrade" title="Ubiquiti website">Ubiquiti</a> highly recommended
