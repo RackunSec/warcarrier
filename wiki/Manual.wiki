@@ -3,12 +3,12 @@
 = Installation =
 
 ===dependencies (in Debian)===
-This should get us going:
-{{{
-cpan -i JSON::XS
-cpan -i Curses::UI
-apt-get install libpcap-dev iw build-essential sqlite-dev
-# some of the above names may need changed do apt-cache search fo them
+This should get us going in DEBIAN (dependencies already installed in WEAKERTH4N LINUX and WarcarrierOS):
+
+{{{ 
+apt-get update
+apt-get install libcurses-perl libjson-xs-perl 
+apt-get install libpcap-dev iw build-essential sqlite3-dev
 mkdir /tmp/aircrack && cd /tmp/aircrack
 svn co http://trac.aircrack-ng.org/svn/trunk/ new
 cd new
