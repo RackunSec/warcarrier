@@ -53,7 +53,7 @@ In the image below we can see a sample being "recorded" of the site, or surround
 
 <img src="http://warcarrier.org/images/wcapp.png"/>
 
-The log is a simple CSV file, which can then be "replayed" at any time in the future.
+The log is a simple CSV file, which can then be "replayed" at any time in the future. To begin recording simply hit "r" and to stop hit "r" again. hit "x" at anytime to close the Bluetooth Spectrum Analysis window.
 
 == Spectools ==
 <a href="http://www.kismetwireless.net/spectools/">http://www.kismetwireless.net/spectools/</a>
