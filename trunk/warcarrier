@@ -35,12 +35,15 @@ use strict;
 use Curses::UI; # See CPAN website for usage on these
 use JSON::XS;   #   modules.
 ### GET ARGUMENTS BEFORE CONTINUING ###
+my $airchk = `aircrack-ng 2>/dev/null | grep Otre`; # grep Thomas
+die "Please install the Aircrack-NG suite for use with Airodump-NG.\n" if ($airchk !~ m/Thomas/);
+my $gpschk = `gpsd -V`;
+die "Please install GPSd Version 3.2 before continuing\n" if ($gpschk !~ m/revision/);
 my $filename; # to read from
 my $wfdev; # wifi device
 my $btdev = ''; # bluetooth device
 my $date = localtime();
 my $sats;
-
 my $wpc = 0; # waypoints counter
 my $btdc = 0;
 
@@ -74,15 +77,7 @@ system("touch gps.TPV"); # create our gps TPV Packet file
 system("touch gps.SKY"); # create our gps SKY packet file
 
 my $cui = new Curses::UI(-color_support=>1); # create a curses object
-
-#my $co = new Curses::UI::Color();
-#$co->define_color(qw/ orange 200 200 200/);
-#my @colos=$co->get_colors();
-#my $clst='';
-#foreach(@colos){$clst.=$_;}
-
 $cui->status(-message=>"Please wait while the WARCARRIER initializes",-fg=>"white",-bold=>1,-bg=>"black"); # please hold.
-#$cui->status(-message=>$clst,-fg=>"white",-bold=>1,-bg=>"black"); # please hold.
 
 my @allsats; # for ALL satellites (HTML logging)
 my $gps = "NULL";
