@@ -1,15 +1,11 @@
-WARCARRIER 2013 - Written by Douglas Berdeaux 
-WeakNet Labs at Gmail dot com
-_____________
-1.# USAGE ###==>
-~~~~~~~~~~~~~
+# WARCARRIER 2013 - Written by Douglas Berdeaux 
+This application comes with all version of Weakerthan Linux version 4+
+# Usage
 start:
 	./warcarrier -d <wlan device> -f <filename for airodump>
 
-____________________________________
-2.# CONTROLS in Instrument Panel ###==>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-quit: (gtfo)
+# Keyboard Shortcuts
+quit: exit warcarrier
 	"q" or CTRL+C or CTRL+X
 snapshot: (Take a snapshot of your surrounding area's devices)
 	"s"
@@ -22,9 +18,7 @@ Catchme-NG:
 Ubertooth Spec analyzer:
 	"u" and then "x" to exit it.
 
-_____________
-3.# FILES ###==>
-~~~~~~~~~~~~~
+# Explanation of files
 ./includes/(html|sound)/* - files for HTML logging and output.
 ./lib/* - Perl modules needed by WARCARRIER
 ./wcd - WARCARRIER scanning daemon for Bluetooth and GPS (runs automatically)
