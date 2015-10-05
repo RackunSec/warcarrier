@@ -1,10 +1,11 @@
 # WARCARRIER 2013 - Written by Douglas Berdeaux 
 This application comes with all version of Weakerthan Linux version 4+
-<img src="https://weaknetlabs.com/images/wc.gif" />
 # Usage
-Start Warcarrier: ./warcarrier -d <wlan device> -f <filename for airodump>
+Start Warcarrier: ./warcarrier -d (wlan device) -f (airodump-NG output file name)
 
 # Keyboard Shortcuts/Usage
+
+The table below lists the keyboard shortcuts that can be used in Warcarrier.
 
 | Key | Command |
 | ------------- |
