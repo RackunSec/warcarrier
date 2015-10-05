@@ -35,6 +35,15 @@ The table below lists the keyboard shortcuts that can be used in Warcarrier.
 
 </table>
 
+# Dependencies
+<table>
+<tr><td>Aircrack-NG Suite</td><td>For Airodump-NG and 802.11 Scanning</td></tr>
+<tr><td>ALFA 1W Adapater</td><td>Passive scanning 802.11</td></tr>
+<tr><td>Bluetooth Dongle</td><td>Active scanning for Bluetooth devices</td></tr>
+<tr><td>Ubertooth One</td><td>For scanning with Bluetooth (Spectrum Analysis)</td></tr>
+<tr><td>Spectools_raw</td><td>https://www.kismetwireless.net/spectools/</td></tr>
+</table>
+
 # Explanation of files
 <table>
 <tr><td>./includes/(html|sound)/.*</td><td>files for HTML logging and output.</td></tr>
