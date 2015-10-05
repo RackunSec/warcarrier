@@ -1,7 +1,11 @@
 # WARCARRIER 2013 - Written by Douglas Berdeaux 
-This application comes with all version of Weakerthan Linux version 4+
+This application comes with all version of Weakerthan Linux version 4 and up
+<a target="_blank" href="http://weaknetlabs.com/linux"></a>
+<img src="https://weaknetlabs.com/images/wc.gif"/>
+
 # Usage
-Start Warcarrier: ./warcarrier -d (wlan device) -f (airodump-NG output file name)
+Start Warcarrier: ./warcarrier -d (wlan device) -f (airodump-NG output file name)<br />
+In Weakerthan Linux, you can simply click on the Warcarrier icon in the dock.
 
 # Keyboard Shortcuts/Usage
 
