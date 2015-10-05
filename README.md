@@ -7,15 +7,17 @@ Start Warcarrier: ./warcarrier -d (wlan device) -f (airodump-NG output file name
 
 The table below lists the keyboard shortcuts that can be used in Warcarrier.
 
-| Key | Command |
-| ------------- |
-| q | Quit/exit Warcarrier |
-| g | Reset the dynmic 802.11 dbm graph |
-| i | Show satellite details |
-| c | Start CatchmeNG plugin |
-| u | Ubertooth Spectrum Analyzer |
-| w | Create a waypoint (for logging your process/trek) |
-| s | Take/log a snapshot of the surroundings with a timestamp |
+<table>
+	<tr><td>Key</td><td>Command</td></tr>
+	<tr><td>q</td><td>Quit/Exit</td></tr>
+	<tr><td>g</td><td>Reset the dynmic 802.11 dbm graph</td></tr>
+	<tr><td>i</td><td>Show satellite details</td></tr>
+	<tr><td>c</td><td>Start CatchmeNG plugin</td></tr>
+	<tr><td>u</td><td>Ubertooth Spectrum Analyzer</td></tr>
+	<tr><td>w</td><td>Create a waypoint (for logging your process/trek)</td></tr>
+	<tr><td>s</td><td>Take/log a snapshot of the surroundings with a timestamp</td></tr>
+
+</table>
 
 # Explanation of files
 ./includes/(html|sound)/*files for HTML logging and output.
