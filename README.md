@@ -1,7 +1,7 @@
 # WARCARRIER
-This application comes with all version of Weakerthan Linux version 4 and up
-<a target="_blank" href="http://weaknetlabs.com/linux"></a>
-<img src="https://weaknetlabs.com/images/wc.gif"/>
+This application comes with all version of Weakerthan Linux version 4 and up<br />
+<a target="_blank" href="http://weaknetlabs.com/linux">Weakerthan Linux Distro from WeakNet Labs</a><br />
+<img src="https://weaknetlabs.com/images/wc.gif"/><br />
 Warcarrier is a dashboard for scanning and trolling 802.11 WiFi, 802.15.1 Bluetooth, and GPS. This application was designed to show a large amount of live data, as a large carrier ship may have in the main deck/helm. The name "Warcarrier" was inspired by the famous "Blue Ghost" aircraft carrier. Below are a few functions that can be done with Warcarrier,
 <ul>
 	<li>CatchMe-NG for trolling for MAC addresses, ESSIDs, etc</li>
@@ -13,7 +13,7 @@ Warcarrier is a dashboard for scanning and trolling 802.11 WiFi, 802.15.1 Blueto
 	<li>Read detailed information on any satellite that you can receive from (Using PNRID and NASA data)</li>
 </ul>
 A simple deomstratoin video showing off some of the functionality from a BETA demo:
-<iframe width="640" height="480" src="https://www.youtube.com/embed/0SNPzJ3ejFU" frameborder="0" allowfullscreen></iframe>
+<a href="https://www.youtube.com/embed/0SNPzJ3ejFU">https://www.youtube.com/embed/0SNPzJ3ejFU</a><br />
 
 # Usage
 Start Warcarrier: ./warcarrier -d (wlan device) -f (airodump-NG output file name)<br />
