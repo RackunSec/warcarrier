@@ -5,16 +5,15 @@ This application comes with all version of Weakerthan Linux version 4+
 Start Warcarrier: ./warcarrier -d <wlan device> -f <filename for airodump>
 
 # Keyboard Shortcuts/Usage
-|Key|Command|
-|---|
-|q|quit/exit Warcarrier</li>
-|g|reset the dynmic 802.11 dbm graph</li>
-|i|Show satellite details</li>
-|c|Start Catchme-NG plugin</li>
-|u|Ubertooth Spectrum Analyzer</li>
-|w|Create a waypoint - for logging your process/trek</li>
-|s|take/log a snapshot of the surroundings with a timestamp</li>
-|w|Create a waypoint - for logging your process/trek</li>
+| Key | Command |
+| ------------- |
+| q | Quit/exit Warcarrier |
+| g | Reset the dynmic 802.11 dbm graph |
+| i | Show satellite details |
+| c | Start Catchme-NG plugin |
+| u | Ubertooth Spectrum Analyzer |
+| w | Create a waypoint - for logging your process/trek |
+| s | Take/log a snapshot of the surroundings with a timestamp |
 
 # Explanation of files
 ./includes/(html|sound)/*files for HTML logging and output.
