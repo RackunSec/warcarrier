@@ -11,8 +11,6 @@ Warcarrier is a dashboard for scanning and trolling 802.11 WiFi, 802.15.1 Blueto
 	<li>Log results in HTML format</li>
 	<li>Include interactive maps from their scans using the Google Maps API</li>
 	<li>Read detailed information on any satellite that you can receive from (Using PNRID and NASA data)</li>
-	<li></li>
-	<li></li>
 </ul>
 A simple deomstratoin video showing off some of the functionality from a BETA demo:
 <iframe width="640" height="480" src="https://www.youtube.com/embed/0SNPzJ3ejFU" frameborder="0" allowfullscreen></iframe>
