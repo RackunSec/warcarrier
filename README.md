@@ -37,6 +37,8 @@ The table below lists the keyboard shortcuts that can be used in Warcarrier.
 
 # Dependencies
 <table>
+<tr><td>Curses::UI</td><td>http://search.cpan.org/~mdxi/Curses-UI-0.9609/lib/Curses/UI.pm</td></tr>
+<tr><td>JSON::XS</td><td>http://search.cpan.org/~mlehmann/JSON-XS-3.01/XS.pm</td></tr>
 <tr><td>Aircrack-NG Suite</td><td>For Airodump-NG and 802.11 Scanning</td></tr>
 <tr><td>ALFA 1W Adapater</td><td>Passive scanning 802.11</td></tr>
 <tr><td>Bluetooth Dongle</td><td>Active scanning for Bluetooth devices</td></tr>
