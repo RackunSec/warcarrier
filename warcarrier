@@ -79,8 +79,8 @@ $cui->status(-message=>"Please wait while the WARCARRIER initializes",-fg=>"whit
 
 my @allsats; # for ALL satellites (HTML logging)
 my $gps = "NULL";
-my $lat = "0.00000N";
-my $lon = "0.00000W";
+my $lat = "0.00000";
+my $lon = "0.00000";
 my $alt = 0;
 my $dump = ''; # dump string for printing in window
 my $apc = 0; # AP Count for WiFi
@@ -424,8 +424,7 @@ sub getgpsd{
 	if($lat && $lon){
 		$lat =~ s/-//;
 		$lon =~ s/-//;
-		$lat.='N';
-		$lon.='W';
+		$lon = '-'.$lon;
 	} # Here I update your window's labels with some data:
 	$winlon::label->text($lon);
 	$winlat::label->text($lat);
@@ -473,8 +472,8 @@ sub getwifi{ ### GET WIFI STATS ###
 		my $essid = $h->{'ESSID'};
 		$essid =~ s/'/\'/g; # fix ESSIDs
 		$dump .= $h->{'BSSID'} . ", " . $h->{'CH'} . ", " . $h->{'PWR'} . ", " . $h->{'SEC'} . ", " . $essid . "\n"; 
-		if(!$lat){ $lat = "0.00000N"; }
-		if(!$lon){ $lon = "0.00000W"; }
+		if(!$lat){ $lat = "0.00000"; }
+		if(!$lon){ $lon = "0.00000"; }
 		if($lat ne "" && $lon ne "") { # let's not log if there's no coords so that JS doesn't break for the Maps:
 			my $logaps = $h->{'BSSID'} . ", " . $h->{'CH'} . ", " . $h->{'PWR'} . ", " . $h->{'SEC'} . ", " . $essid . "," . $lat . "," . $lon;
 			$logaps =~ s/, /,/g; # remove spaces from commas
@@ -668,8 +667,8 @@ sub eggsit{ ### QUIT CTRL+C "q" ###
 			open(FLE,">>logs/html/logfile-$date.html"); # TODO altitude in GMAPS ?
 			printhtml('includes/html/top.html');
 			my @slatlon = split(/,/,$logaps[0]); # get starting lat and lon
-			my $slat = $slatlon[5];
-			my $slon = $slatlon[6];
+			my $slat = '"'.$slatlon[5].'"';
+			my $slon = '"'.$slatlon[6].'"';
 			my $map = lib::GMAPS->new($lat,$lon);
 			print FLE "var lat = $slat;\n";
 			print FLE "var lon = $slon;\n";
@@ -677,8 +676,9 @@ sub eggsit{ ### QUIT CTRL+C "q" ###
 			my $i = 0;
 			foreach(@logaps){ # All of my WiFi APs:
 				my @platlon = split(/,/,$_);# latitude and longitude for each marker object
+				$_ =~ s/(N|W)$// foreach @platlon;
 				print FLE $map->pos_mark($i,$platlon[5],$platlon[6],'wf') . "\n"; # sent
-				print FLE $map->con_str($platlon[0],$platlon[1],$platlon[2],$platlon[3],$platlon[4],$platlon[5],$platlon[6]) . "\n";
+				print FLE $map->con_str($platlon[0],$platlon[1],$platlon[2],$platlon[3],$platlon[4],$platlon[5],$platlon[6])."\n";
 				print FLE $map->info_win($i) ."\n"; # make the info window for the marker
 				$i++; # this little token keeps all map objects unique!
 			} # $i is still at cap from wifi shit:
