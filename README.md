@@ -1,7 +1,7 @@
 # WARCARRIER
 This application comes with all version of Weakerthan Linux version 4 and up<br />
 <a target="_blank" href="http://weaknetlabs.com/linux">Weakerthan Linux Distro from WeakNet Labs</a><br />
-<img src="https://weaknetlabs.com/images/wc.gif"/><br />
+<img src="https://weaknetlabs.com/images/wc.gif"/><br /><br />
 Warcarrier is a dashboard for scanning and trolling 802.11 WiFi, 802.15.1 Bluetooth, and GPS. This application was designed to show a large amount of live data, as a large carrier ship may have in the main deck/helm. The name "Warcarrier" was inspired by the famous "Blue Ghost" aircraft carrier. Below are a few functions that can be done with Warcarrier,
 <ul>
 	<li>CatchMe-NG for trolling for MAC addresses, ESSIDs, etc</li>
@@ -12,7 +12,14 @@ Warcarrier is a dashboard for scanning and trolling 802.11 WiFi, 802.15.1 Blueto
 	<li>Include interactive maps from their scans using the Google Maps API</li>
 	<li>Read detailed information on any satellite that you can receive from (Using PNRID and NASA data)</li>
 </ul>
-A simple deomstratoin video showing off some of the functionality from a BETA demo:
+#Screenshots
+This is the "instrument panel" screen which you can monitor the air around you with. Click on the image to view it full-sized.
+<img src="https://weaknetlabs.com/images/warcarrier-screen-1.PNG"/><br /><br />
+This is the Ubertooth One Spectrum Analysis code at work. Click on the image to view it full-sized.
+<img src="https://weaknetlabs.com/images/warcarrier-screen-2.PNG"/><br /><br />
+And here is a Google-Maps API enabled log file (HTML). Click on the image to view it full-sized.
+<img src="https://weaknetlabs.com/images/warcarrier-screen-0.PNG"/><br /><br />
+A simple deomstration video showing off some of the functionality from a BETA demo:
 <a href="https://www.youtube.com/embed/0SNPzJ3ejFU">https://www.youtube.com/embed/0SNPzJ3ejFU</a><br />
 
 # Usage
