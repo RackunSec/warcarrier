@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # WARCARRIER (c) GNU - 2013 WeakNet Labs
+#
+# version 1.0 (Final WarcarrierOS version)
 #
 # "...because when we are done hacking the planet,
 #   - we will hack the sky!" - Douglas Berdeaux 2013
@@ -11,10 +13,10 @@
 # 
 # NOTES: any hacking to this file CAN be bad. curses in Perl
 #   is very delicate and will fail without returning errors
-#   if teh slightest thing goes wrong. In fact, if it does it
+#   if the slightest thing goes wrong. In fact, if it does it
 #   without hacking, just restart it because it probabaly means
 #   that the buffer files haven't been made yet.
-#   If you see any "sleep"'s in here - that's why.
+#   If you see any "sleep"'s in here - that's why, for intialization.
 #
 # CLEANUP: please run "./wcclean proc" to destroy any left processes
 #   by Curses::UI failing before stopping them. This won't destory
@@ -137,7 +139,7 @@ local $ubt2412::label;
 local $ubt2413::label; 
 local $ubt2414::label; 
 local $ubt2415::label; 
-my @arrlabel; # retarded
+my @arrlabel; # 
 local $ubt2416::label; 
 local $ubt2417::label; 
 local $ubt2418::label; 
@@ -195,16 +197,6 @@ local $ubt2469::label;
 local $ubt2470::label; 
 local $ubt2471::label; 
 local $ubt2472::label; 
-=pod
-local $ubt2473::label; 
-local $ubt2474::label; 
-local $ubt2475::label; 
-local $ubt2476::label; 
-local $ubt2477::label; 
-local $ubt2478::label; 
-local $ubt2479::label; 
-local $ubt2480::label; 
-=cut
 my $winubt;
 my $ubton = 0;
 
@@ -627,10 +619,6 @@ sub sigbar{ ### My Channel Signal Bars ###
         		$ubt2457::label,$ubt2458::label,$ubt2459::label,$ubt2460::label,$ubt2461::label,$ubt2462::label,$ubt2463::label,
         		$ubt2464::label,$ubt2465::label,$ubt2466::label,$ubt2467::label,$ubt2468::label,$ubt2469::label,$ubt2470::label,
         		$ubt2471::label,$ubt2472::label);
-=pod
-,$ubt2473::label,$ubt2474::label,$ubt2475::label,$ubt2476::label,$ubt2477::label,
-        		$ubt2478::label,$ubt2479::label,$ubt2480::label); # i'm looking forward to defining this fucking thing everywhere.
-=cut
 		foreach(@arrlabel){
 			$_->text($bars[$n]);
 			$n++;
@@ -879,18 +867,6 @@ sub startubt{ # start Ubertooth scanning:
 	my $red = $winubt->add('red','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"red",-y=>4,-x=>83,-text=>" ");
 	my $reddbm = $winubt->add('reddbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>4,-x=>84,-text=>"<-91dBm");
 
-=pod # unfortunately, Curses::UI is a big clunky piece of garbage. Deosn;t report errors, can't do globals, etc. 
-	# this piece of code would have saved 80 lines, but cannot be implemented in Curses::UI's current "state"
-	# not sure why the author didn;t give a fuck about errors. I mean, seriously.
-	my $m=8;
-	@arrlabel=($ubt2408::label,$ubt2409::label,$ubt2410::label,$ubt2411::label,$ubt2412::label,$ubt2413::label,$ubt2414::label,$ubt2415::label);
-	foreach(@arrlabel){
-		my $n = $m; # 2408
-		$n += 2400;
-		$_ = $winubt->add("$n","Label",-height=>30,-width=>4,-reverse=>1,-y=>1,-x=>$m,-border=>1);
-		$m++;
-	}
-=cut		
 	$ubton=1;
 	$winubt->focus();
 }
