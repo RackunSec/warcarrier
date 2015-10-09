@@ -35,15 +35,12 @@ use strict;
 use Curses::UI; # See CPAN website for usage on these
 use JSON::XS;   #   modules.
 ### GET ARGUMENTS BEFORE CONTINUING ###
-my $airchk = `aircrack-ng 2>/dev/null | grep Otre`; # grep Thomas
-die "Please install the Aircrack-NG suite for use with Airodump-NG.\n" if ($airchk !~ m/Thomas/);
-my $gpschk = `gpsd -V`;
-die "Please install GPSd Version 3.2 before continuing\n" if ($gpschk !~ m/revision/);
 my $filename; # to read from
 my $wfdev; # wifi device
 my $btdev = ''; # bluetooth device
 my $date = localtime();
 my $sats;
+
 my $wpc = 0; # waypoints counter
 my $btdc = 0;
 
@@ -67,8 +64,7 @@ my $airtest = `ps aux | grep "airodump.*[c]apfiles" |wc -l`;
 if($airtest < 1){ # just in case Curses::UI - well, you know.
 	system("airodump-ng $wfdev --write $filename 2>/dev/null &"); # start scanning wifi
 }else{
-	$filename = `ps aux | grep -i airodump-n[g] | head -n 1 | awk '{print \$14}'`;
-	$filename.="-01.csv"; # restart pipe
+	die("Airtest FAILED\n");
 }
 $filename.="-01.csv"; # Airodump-ng does this to make unique files
 system("touch bt.out"); # create our bluetooth scanning file
@@ -209,13 +205,6 @@ local $ubt2478::label;
 local $ubt2479::label; 
 local $ubt2480::label; 
 =cut
-### UBERTOOTH RECORDING ###
-local $rec::label; 
-my $record = 0; # boolean for recording
-my $recblink = 0; # blink 0 = off # 1 = on
-my $f = 0;
-my $udisp = 0; # Ubertooth screen displaying?
-
 my $winubt;
 my $ubton = 0;
 
@@ -360,10 +349,9 @@ $cui->set_binding( \&snapshot, "\cS"); # literally means CTRL+S (Snapshots)
 $cui->set_binding( \&snapshot, "s"); # s (Snapshots)
 $cui->set_binding( \&satinfo, "i"); # i Satellite infoz
 $cui->set_binding( \&catchmeinput, "c"); # c Catchme-NG
-$cui->set_binding( \&stopubt, "x"); # Stop Ubertooth Scanner
-$cui->set_binding( \&startubt, "u"); # Start Ubertooth Scanner
-$cui->set_binding( \&waypoint, "w"); # set a waypoint into Google Map
-$cui->set_binding( \&rec, "r"); # record BT DUMP
+$cui->set_binding( \&stopubt, "x"); # c Catchme-NG
+$cui->set_binding( \&startubt, "u"); # c Catchme-NG
+$cui->set_binding( \&waypoint, "w"); # c Catchme-NG
 
 ### END WINDOWS ###
 #my $n = '('; # uncomment these two for ultra speed! (gps cannot keep up really though.
@@ -770,7 +758,7 @@ sub satinfo{ ### WHich satellite to query? ###
 }
 sub satdat{ ### Display the information ###
 	my $sat = lib::SATINFO->new($_[0]);
-	$cui->dialog(-height=>100,-width=>100,-message=>"PRNID:" . $sat->satdata('PRN') . "\nInternational Code: " . $sat->satdata('INTCODE') . "\nNORAD ID: " . $sat->satdata('NORADID') . "\nLaunch Date: " . $sat->satdata('LD') . "\nNAVSTAR ID: " . $sat->satdata('NAVSTAR') . "\n\n" . $sat->satdata('TRIV'),-title=>"Satellite Info from NASA",-tfg=>"black",-tbg=>"yellow");
+	$cui->dialog(-message=>"PRNID:" . $sat->satdata('PRN') . "\nInternational Code: " . $sat->satdata('INTCODE') . "\nNORAD ID: " . $sat->satdata('NORADID') . "\nLaunch Date: " . $sat->satdata('LD') . "\nNAVSTAR ID: " . $sat->satdata('NAVSTAR') . "\n\n" . $sat->satdata('TRIV'),-title=>"Satellite Info from NASA",-tfg=>"black",-tbg=>"yellow");
 }
 ### Catchme-NG STUFF ###
 sub catchmeinput{
@@ -809,19 +797,12 @@ sub waypoint{
 
 ### UBEROOTH SPEC ANALYZER STUFF: ###
 sub startubt{ # start Ubertooth scanning:
-	if($udisp==1){ 
-		return; # it's already ON!
-	}else{
-		$udisp = 1; # turn on display for Uberooth Boolean (used for recording)
-	}
 	return if($ubton==1);
-	system("./uber2th &");
+	system("./wbt_pi &");
 	$winubt = $cui->add('ubt','Window',-y=>1,-title=>"Bluetooth Spectrum Analyzer",-border=>1,-height=>35,-width=>120,-padleft=>15,-tfg=>"black",-tbg=>"yellow");
 	my $ldbm = $winubt->add('ldbm','Label',-height=>35,-width=>7,-fg=>"white",-text=>"-70dBm \n-\n--\n---\n--\n-75dBm\n-\n--\n---\n--\n-80dBm\n-\n--\n---\n--\n-85dBm\n-\n--\n---\n--\n-90dBm\n-\n--\n---\n--\n-95dBm\n-\n--\n---\n--\n-100dBm",-x=>0,-bold=>1);
 	my $lghz = $winubt->add('lghz','Label',-height=>1,-width=>99,-fg=>"white",-text=>"2400MHz 2408MHz 2416MHz 2424MHz 2432MHz 2440MHz 2448MHz 2456MHz 2464MHz 2472MHz",-x=>8,-bold=>1,-y=>31);
-	my $lclose = $winubt->add('lclose','Label',-dim=>1,-height=>1,-fg=>"white",-text=>"\t\t\t\t\t\t\t(r) start/stop recording site\t(x) to close",-x=>1,-padtop=>32,-width=>105);
-	$lclose->set_attribute('-dim',1);
-	$rec::label = $winubt->add('rec','Label',-fg=>"red",-width=>30,-x=>8,-text=>"",-padtop=>32,-bold=>1);
+	my $lclose = $winubt->add('lclose','Label',-height=>1,-fg=>"white",-text=>"\t\t\t\t\t\t\t\t\t(x) to close",-x=>1,-padtop=>32,-width=>105);
 	## Build new labels: ##
 	$ubt2408::label = $winubt->add('2408','Label',-height=>30,-width=>1,-reverse=>1,-fg=>"yellow",-y=>1,-x=>8);
 	$ubt2409::label = $winubt->add('2409','Label',-height=>30,-width=>2,-reverse=>1,-fg=>"green",-y=>1,-x=>9);
@@ -888,7 +869,7 @@ sub startubt{ # start Ubertooth scanning:
 	$ubt2470::label = $winubt->add('2470','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>70);
 	$ubt2471::label = $winubt->add('2471','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>71);
 	$ubt2472::label = $winubt->add('2472','Label',-height=>30,-width=>4,-reverse=>1,-fg=>"yellow",-y=>1,-x=>72);
-=pod	
+	
 	my $blue = $winubt->add('blue','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"blue",-y=>1,-x=>83,-text=>" ");
 	my $bluedbm = $winubt->add('bluedbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>1,-x=>84,-text=>">-75dBm");
 	my $green = $winubt->add('green','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"green",-y=>2,-x=>83,-text=>" ");
@@ -897,7 +878,6 @@ sub startubt{ # start Ubertooth scanning:
 	my $yellowdbm = $winubt->add('yellowdbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>3,-x=>84,-text=>"-81~90dBm");
 	my $red = $winubt->add('red','Label',-width=>1,-height=>1,-reverse=>1,-fg=>"red",-y=>4,-x=>83,-text=>" ");
 	my $reddbm = $winubt->add('reddbm','Label',-width=>10,-height=>1,-fg=>"white",-y=>4,-x=>84,-text=>"<-91dBm");
-=cut
 
 =pod # unfortunately, Curses::UI is a big clunky piece of garbage. Deosn;t report errors, can't do globals, etc. 
 	# this piece of code would have saved 80 lines, but cannot be implemented in Curses::UI's current "state"
@@ -915,15 +895,7 @@ sub startubt{ # start Ubertooth scanning:
 	$winubt->focus();
 }
 sub lines2bars{ # pass me an array plz
-	if($record==1){ # show that we are recording
-		$f++; # frames
-		$rec::label->text("*Recording: ".$f." frames");
-	}
 	my @lines = `cat ubt.out`;
-	if($record==1){ # we are recording, let's print the file:
-		my $raw = `cat ubt.raw`;
-		print UBT localtime().",".$lat.",".$lon.",".$raw; # nice.
-	}
 	my @lines2;
 	my $str = ""; # initialize our string
 	#for(my$i=0;$i<=length($lines[$#lines]);$i++){ # we strive until we reach NULL
@@ -944,21 +916,8 @@ sub lines2bars{ # pass me an array plz
 	return(@lines2); # done.
 }
 sub stopubt{ # stop ubertooth scanning:
-	$udisp = 0; # turn off uberooth display
 	$cui->delete('ubt');
 	$ubton=0;
 	my $killcmd = "ps aux | grep [s]pectool | awk '{print \$2}' | xargs kill 2>/dev/null";
 	system($killcmd); # stop scanner
-}
-sub rec{
-	if($record==0 && $udisp==1){ #if Ubertooth display is ON
-		open(UBT,">logs/bluetooth/ubt.csv"); # this is where I store the log
-		$record=1; # turn it on. turn it on and all the way up!
-		# do record here $date.$lon.$lat.$btdump
-	}else{
-		close(UBT);
-		$record=0; # turn it off, we are done recording
-		$f=0; # frame count reset
-		$rec::label->text(""); # just in case we stop when it says "*Recording*"
-	}
 }
