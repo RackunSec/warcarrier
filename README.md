@@ -1,4 +1,4 @@
-# WARCARRIER
+<img src="https://weaknetlabs.com/images/wclogo.png" width=500/><br /><br />
 This application comes with all version of Weakerthan Linux version 4 and up<br />
 <a target="_blank" href="http://weaknetlabs.com/linux">Weakerthan Linux Distro from WeakNet Labs</a><br />
 <img src="https://weaknetlabs.com/images/wc.gif"/><br /><br />
