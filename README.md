@@ -18,7 +18,7 @@ This is the "instrument panel" screen which you can monitor the air around you w
 This is the Ubertooth One Spectrum Analysis code at work. Click on the image to view it full-sized.
 <img src="https://weaknetlabs.com/images/warcarrier-screen-2.PNG"/><br /><br />
 And here is a Google-Maps API enabled log file (HTML). Click on the image to view it full-sized.
-<img src="https://weaknetlabs.com/images/warcarrier-screen-0.PNG"/><br /><br />
+<img src="https://weaknetlabs.com/images/warcarrier-web-screenshot2.PNG"/><br /><br />
 A simple deomstration video showing off some of the functionality from a BETA demo:
 <a href="https://www.youtube.com/embed/0SNPzJ3ejFU">https://www.youtube.com/embed/0SNPzJ3ejFU</a><br />
 
