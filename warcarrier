@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # WARCARRIER (c) GNU - 2013 WeakNet Labs
 #
-# version 1.0 (Final WarcarrierOS version)
+# version 1.3
 #
 # "...because when we are done hacking the planet,
 #   - we will hack the sky!" - Douglas Berdeaux 2013
@@ -58,8 +58,8 @@ if(!$ARGV[0]){
 	$filename = "logs/capfiles/" . $args->getarg('-f',1) . localtime();
 	$filename =~ s/ /./g;
 }
-my $devchk = `iwconfig $wfdev`; # let's see if they passed a valid device,
-if($devchk eq ''){              #  so we can fail gracefully if so.
+my $devchk = `iw dev $wfdev info`; # let's see if they passed a valid device,
+if($devchk eq ''){              #  so we can fail gracefully if so. - UPDATED for IW
 	usage('dev');
 }
 my $airtest = `ps aux | grep "airodump.*[c]apfiles" |wc -l`;

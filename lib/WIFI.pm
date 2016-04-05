@@ -4,7 +4,7 @@
 use strict;
 package lib::WIFI;
 sub aps{
-	my @lines = `cat $_[1] | tr -cd '\11\12\15\40-\176'`; # get rid of bin crap
+	my @lines = `cat $_[1] 2>/dev/null| tr -cd '\11\12\15\40-\176'`; # get rid of bin crap
 	my @APs=(); # Array of hashes of AP data
 	foreach (@lines){ 
 		if($_ =~ m/^[A-F0-9]{2,}:/){

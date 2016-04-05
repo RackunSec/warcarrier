@@ -1,0 +1,5 @@
+#####
+###
+# WARCARRIER NEEDS this directory for Airodump-NG CSV files and tidyness.
+###
+#####
