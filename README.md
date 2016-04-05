@@ -26,6 +26,10 @@ A simple deomstration video showing off some of the functionality from a BETA de
 Start Warcarrier: ./warcarrier -d (wlan device) -f (airodump-NG output file name)<br />
 In Weakerthan Linux, you can simply click on the Warcarrier icon in the dock.
 
+Your Terminal must have specific setting enabled. I am almost always using Gnome Terminal and the settings in WEAKERTHAN Linux are shown in the screenshot below. Without these setting the Curses::UI Perl module creates a lot of garbage on the screen that is unreadable.
+
+<a href="https://weaknetlabs.com/images/gnome-terminal-compatability.PNG"><img src="https://weaknetlabs.com/images/gnome-terminal-compatability.PNG" width=500/></a>
+
 # Keyboard Shortcuts/Usage
 
 The table below lists the keyboard shortcuts that can be used in Warcarrier.
