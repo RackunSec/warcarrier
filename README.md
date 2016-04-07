@@ -1,5 +1,6 @@
 <img src="https://weaknetlabs.com/images/wclogo.png" /><br /><br />
 This application comes with all version of Weakerthan Linux version 4 and up<br />
+OFFICIAL HOMEPAGE: <a href="https://weaknetlabs.com/warcarrier/">https://weaknetlabs.com/warcarrier/</a>
 <a target="_blank" href="http://weaknetlabs.com/linux">Weakerthan Linux Distro from WeakNet Labs</a><br />
 <img src="https://weaknetlabs.com/images/wc.gif"/><br /><br />
 Warcarrier is a dashboard for scanning and trolling 802.11 WiFi, 802.15.1 Bluetooth, and GPS. This application was designed to show a large amount of live data, as a large carrier ship may have in the main deck/helm. The name "Warcarrier" was inspired by the famous "Blue Ghost" aircraft carrier. Below are a few functions that can be done with Warcarrier,
