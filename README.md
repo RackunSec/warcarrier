@@ -56,7 +56,10 @@ The table below lists the keyboard shortcuts that can be used in Warcarrier.
 <tr><td>Bluetooth Dongle</td><td>Active scanning for Bluetooth devices</td></tr>
 <tr><td>Ubertooth One</td><td>For scanning with Bluetooth (Spectrum Analysis)</td></tr>
 <tr><td>Spectools_raw</td><td>https://www.kismetwireless.net/spectools/</td></tr>
+<tr><td>Net::Bluetooth</td><td>http://search.cpan.org/~iguthrie/Net-Bluetooth-0.40/Bluetooth.pm</td></tr>
 </table>
+
+** NOTE in KALI Linux you may have to edit your /etc/default/gpsd to have START_DAEMON and USBAUTO to "false". Also, you may need to reboot as restarting/reloading the daemon doesn't seem to complete the process - All credit for the troubleshooting of this and info for KALI goes to Grant Stone.
 
 # Explanation of files
 <table>
