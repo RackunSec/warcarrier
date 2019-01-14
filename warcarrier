@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # WARCARRIER (c) GNU - 2013 WeakNet Labs
 #
-# version 1.3
+# version 1.4
 #
 # "...because when we are done hacking the planet,
 #   - we will hack the sky!" - Douglas Berdeaux 2013
@@ -25,12 +25,12 @@
 # UBERTOOTH: this functionality takes the "raw" daya from the Ubertooth
 #   device using spectools_raw from Dragorn.
 #
-# My own modules:
-require lib::GMAPS;   # - create "map" objects
-require lib::ARGS;    # - get arguments nicely
-require lib::GPSO;    # - get GPS data from gpsd
-require lib::WIFI;    # - get wifi data from Airodump-ng output csv file
-require lib::SATINFO; # - get satellite info from NASA website (offline)
+# My own modules - fixed random new Perl issue with full paths (2019):
+require "./lib/GMAPS.pm";   # - create "map" objects
+require "./lib/ARGS.pm";    # - get arguments nicely
+require "./lib/GPSO.pm";    # - get GPS data from gpsd
+require "./lib/WIFI.pm";    # - get wifi data from Airodump-ng output csv file
+require "./lib/SATINFO.pm"; # - get satellite info from NASA website (offline)
 use warnings;         # obviously.
 use strict;
 # Other modules
